@@ -7,6 +7,7 @@ export default function Layout() {
       <Stack.Screen name="/(main_screen)/index" options={{ headerShown: false }} />
       <Stack.Screen name="/(main_screen)/seat-availability" options={{ headerShown: false }} />
       <Stack.Screen name="/(main_screen)/seat-availability-main" options={{ headerShown: false }} />
+      <Stack.Screen name="(main_screen)/map" />
     </Stack>
   );
 }

@@ -7,7 +7,7 @@ import {
   StyleSheet,
 } from "react-native";
 import { Calendar } from "react-native-calendars";
-import { Stack, useRouter } from "expo-router";
+import { Stack, useRouter, router } from "expo-router";
 import CustomText from "@/components/CustomText";
 
 import { Ionicons } from "@expo/vector-icons";
@@ -73,6 +73,7 @@ const EventList = () => {
         </View> */}
         <TouchableOpacity>
           <CustomText style={styles.seeMore}>See More</CustomText>
+          onPress={() => router.replace("/(main_screen)/event-types")}
         </TouchableOpacity>
 
         <Calendar

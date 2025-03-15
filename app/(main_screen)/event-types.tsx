@@ -1,7 +1,18 @@
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import { Ionicons } from "@expo/vector-icons";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  FlatList,
+  Image,
+  Dimensions,
+} from "react-native";
+import { Link, router } from "expo-router";
+// import { useNavigation } from "@react-navigation/native";
+import TopNavigationComponent from "@/components/topNavigationComponent";
+
+const { width } = Dimensions.get("window");
 
 const events = [
   {
@@ -49,90 +60,87 @@ const events = [
 ];
 
 const UpcomingEventsScreen = () => {
-  const navigation = useNavigation();
+  // const navigation = useNavigation();
 
   return (
-    <View style={styles.container}>
-      {/* Header Section */}
-      <View style={styles.header}>
+    <>
+      <TopNavigationComponent
+        title={"Upcoming Events"}
+        subtitle={""}
+        navigateTo={"/(main_screen)/service-menu"}
+      />
+      <View style={styles.container}>
+        <FlatList
+          data={events}
+          keyExtractor={(item) => item.id}
+          numColumns={1}
+          ListHeaderComponent={<View style={{ height: 20 }} />} // Creates space below the header
+          contentContainerStyle={{ paddingBottom: 100 }} // Avoids clipping at the bottom
+          renderItem={({ item }) => (
+            <View style={styles.eventCard}>
+              <Image source={item.image} style={styles.eventImage} />
+              <Text style={styles.eventTitle}>{item.title}</Text>
+              <Text style={styles.eventDate}>{item.date}</Text>
+            </View>
+          )}
+        />
+
+        {/* Floating Button */}
         <TouchableOpacity
-          onPress={() => navigation.navigate("EventsAndStalls")}
+          style={styles.createEventButton}
+          onPress={() => router.push("/(main_screen)/event-reg-form")}
         >
-          <Ionicons
-            name="arrow-back"
-            size={24}
-            color="white"
-            style={styles.backIcon}
-          />
-        </TouchableOpacity>
-        <Text style={styles.title}>Upcoming Events</Text>
-        <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
-          <Ionicons
-            name="person-circle-outline"
-            size={28}
-            color="white"
-            style={styles.profileIcon}
-          />
+          <Text style={styles.createEventText}>Create an Event</Text>
         </TouchableOpacity>
       </View>
-
-      {/* Page Fold */}
-      <View style={styles.pageFold} />
-
-      {/* Create Event Button */}
-      <TouchableOpacity
-        style={styles.createEventButton}
-        onPress={() => navigation.navigate("CreateEvent")}
-      >
-        <Text style={styles.createEventText}>Create an Event</Text>
-      </TouchableOpacity>
-    </View>
+    </>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#afd9af",
-    alignItems: "center",
-    paddingTop: 50,
+    backgroundColor: "#FFFFFF",
   },
-  header: {
-    flexDirection: "row",
+  eventCard: {
+    backgroundColor: "#d6e1ed",
+    padding: 10,
+    marginVertical: 5,
+    borderRadius: 10,
     alignItems: "center",
-    justifyContent: "space-between",
+    width: width * 0.9,
+    alignSelf: "center",
+
+    // elevation: 2,
+  },
+  eventImage: {
     width: "100%",
-    paddingHorizontal: 20,
-    backgroundColor: "#39b54a",
-    paddingVertical: 15,
+    height: 200,
+    borderRadius: 10,
+    overflow: "hidden",
   },
-  title: {
-    color: "white",
-    fontSize: 18,
+  eventTitle: {
+    fontSize: 16,
     fontWeight: "bold",
+    textAlign: "center",
+    marginTop: 5,
   },
-  backIcon: {
-    position: "absolute",
-    left: 10,
-  },
-  profileIcon: {
-    position: "absolute",
-    right: 10,
-  },
-  pageFold: {
-    width: 40,
-    height: 20,
-    backgroundColor: "#39b54a",
-    borderTopLeftRadius: 10,
-    marginTop: -10,
-    alignSelf: "flex-start",
-    marginLeft: 10,
+  eventDate: {
+    fontSize: 14,
+    color: "gray",
+    textAlign: "center",
+    marginBottom: 5,
   },
   createEventButton: {
-    marginTop: 50,
+    position: "absolute",
+    bottom: 20,
+    left: "10%",
+    right: "10%",
     backgroundColor: "#39b54a",
-    paddingVertical: 15,
-    paddingHorizontal: 50,
+    padding: 15,
+    alignItems: "center",
     borderRadius: 25,
+    elevation: 5,
   },
   createEventText: {
     color: "white",
@@ -140,3 +148,5 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
+
+export default UpcomingEventsScreen;

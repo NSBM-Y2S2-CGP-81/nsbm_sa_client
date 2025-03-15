@@ -29,6 +29,18 @@ export default function Layout() {
         name="(main_screen)/event-details"
         options={{ headerShown: false }}
       />
+      <Stack.Screen
+        name="(main_screen)/event-types"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="(main_screen)/event-reg-form"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="(main_screen)/user-profile"
+        options={{ headerShown: false }}
+      />
     </Stack>
   );
 }

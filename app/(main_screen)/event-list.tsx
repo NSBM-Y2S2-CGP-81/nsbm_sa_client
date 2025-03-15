@@ -7,17 +7,16 @@ import {
   StyleSheet,
 } from "react-native";
 import { Calendar } from "react-native-calendars";
-import { Stack, useRouter, router } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import CustomText from "@/components/CustomText";
 
-import { Ionicons } from "@expo/vector-icons";
 import TopNavigationComponent from "@/components/topNavigationComponent";
 import EventSearchAndGallery from "@/components/eventsAndGallery";
 
 const events = [
   {
     title: "NSBM Green Fiesta 2025",
-    date: "2025-02-13", // Corrected format for Calendar component
+    date: "2025-02-13",
     time: "3PM",
     venue: "Phase 1 Ground",
     image: require("../../assets/images/green_fiesta.jpg"),
@@ -49,10 +48,10 @@ const EventList = () => {
     router.push({
       pathname: "/(main_screen)/event-details",
       params: {
-        title: "Test",
-        date: "Test",
-        time: "Test",
-        venue: "Test",
+        title: event.title,
+        date: event.date,
+        time: event.time,
+        venue: event.venue,
       },
     });
   };
@@ -68,12 +67,10 @@ const EventList = () => {
       <ScrollView style={styles.container}>
         <EventSearchAndGallery />
 
-        {/* <View style={styles.headerContainer}>
-          <Text style={styles.header}>Set an event</Text>
-        </View> */}
-        <TouchableOpacity>
-          <CustomText style={styles.seeMore}>See More</CustomText>
+        <TouchableOpacity
           onPress={() => router.replace("/(main_screen)/event-types")}
+        >
+          <CustomText style={styles.seeMore}>See More</CustomText>
         </TouchableOpacity>
 
         <Calendar
@@ -90,12 +87,12 @@ const EventList = () => {
                 <View>
                   <Text>-</Text>
                 </View>
-              ); // Fallback in case date is undefined
+              );
 
             const event = events.find((e) => e.date === date.dateString);
 
             return (
-              <View>
+              <View style={styles.calendarDay}>
                 <TouchableOpacity
                   onPress={() => event && goToEventDetails(event)}
                 >
@@ -111,7 +108,7 @@ const EventList = () => {
                         state === "disabled" ? { color: "gray" } : {},
                       ]}
                     >
-                      {date.day ?? "-"} {/* Ensure `day` is not undefined */}
+                      {date.day ?? "-"}
                     </Text>
                   </View>
                 </TouchableOpacity>
@@ -127,50 +124,41 @@ const EventList = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // position: "absolute",
-    backgroundColor: "#FFFFF",
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    fontWeight: "300",
-    borderRadius: 10,
-    padding: 16,
-    backgroundColor: "#AFD9AF",
-  },
-  headerContainer: {
-    padding: "2%",
+    backgroundColor: "#FFFFFF",
   },
   eventCircle: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "rgb(144, 238, 144)",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    // shadowOpacity: 0.25,
+    // shadowRadius: 3.5,
+    // elevation: 5,
   },
-
   eventHighlighted: {
-    backgroundColor: "orange",
+    backgroundColor: "#FF7043", // Orange for highlighted event
+    borderWidth: 2,
+    borderColor: "#FF5722",
   },
-  calendarText: { fontSize: 16 },
-
-  ServicesMenu: {
+  calendarText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#2C3E50",
+  },
+  calendarDay: {
+    justifyContent: "center",
     alignItems: "center",
-    justifyContent: "center", // This will vertically center the content
-    // width: 40,
-    // height: 40,
-    borderRadius: 5,
-    backgroundColor: "#C8E6C9",
   },
   seeMore: {
     textAlign: "center",
     color: "#4CAF50",
-    margin: 2,
-    marginBottom: 10,
-    fontWeight: "200",
-    fontSize: 14,
+    margin: 10,
+    fontWeight: "600",
+    fontSize: 16,
   },
 });
 

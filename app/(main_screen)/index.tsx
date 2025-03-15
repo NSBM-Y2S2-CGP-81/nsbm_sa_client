@@ -109,7 +109,7 @@ export default function HomeScreen() {
                 name="person"
                 size={24}
                 color="#1B5E20"
-                onPress={() => router.push("/(auth)/sign-in")}
+                onPress={() => router.push("/(main_screen)/user-profile")}
               />
             </View>
           </View>
@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   carouselImage: {
-    width: "90%",
+    width: "85%",
     height: "95%",
     borderRadius: 12,
   },

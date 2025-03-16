@@ -39,40 +39,57 @@ const SignInScreen = () => {
       }
 
       const data = await response.json();
+
       console.log(data);
-      const apiKey = data.access_token;
-      const full_name = data.full_name;
-      const email = data.email;
-      const phone_number = data.phone_number;
-      const user_type = data.user_type;
-      // const password = password;
-      // Delete existing API key before setting the new one
+
+      // Validate that all required fields exist
+      if (!data.access_token || !data.email || !data.full_name) {
+        throw new Error("Incomplete response from server.");
+      }
+
+      console.log("Received data:", data);
+
+      // Prepare key-value pairs for AsyncStorage
+      const userDetails = {
+        apiKey: data.access_token,
+        full_name: data.full_name,
+        email: data.email,
+        phone_number: data.phone_number || "",
+        user_type: data.user_type || "",
+        student_id: data.student_id || "",
+        intake: data.intake || "",
+        degree: data.degree || "",
+        university: data.university || "",
+        nic: data.nic || "",
+        created_at: data.created_at || "",
+        password: password, // Store password only if necessary (security risk)
+      };
+
+      // Remove old API key before storing new data
       await AsyncStorage.removeItem("apiKey");
 
-      // Store the new API key
-      await AsyncStorage.setItem("apiKey", apiKey);
-      await AsyncStorage.setItem("full_name", full_name);
-      await AsyncStorage.setItem("email", email);
-      await AsyncStorage.setItem("phone_number", phone_number);
-      await AsyncStorage.setItem("user_type", user_type);
-      await AsyncStorage.setItem("password", password);
+      // Store all data in AsyncStorage
+      await Promise.all(
+        Object.entries(userDetails).map(([key, value]) =>
+          AsyncStorage.setItem(key, value),
+        ),
+      );
 
       Toast.show({
         type: "success",
         position: "top",
-        text1: "API Key",
-        text2: apiKey,
+        text1: "Login Successful",
+        text2: "You are now signed in!",
       });
-      router.replace("/");
-      // console.error(apiKey);
 
-      // router.push("/"); // Navigate to the next screen after successful login
+      router.replace("/");
     } catch (error) {
       console.error("Login error:", error);
       Toast.show({
         type: "error",
         position: "top",
         text1: "Login Failed",
+        text2: error.message || "An error occurred. Please try again.",
       });
     }
   };

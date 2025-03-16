@@ -1,4 +1,3 @@
-// FacultyCard.js
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
@@ -26,7 +25,7 @@ const TopNavigationComponent = ({ title, subtitle, navigateTo }) => {
           name="person"
           size={24}
           color="#1B5E20"
-          onPress={() => router.push("/seat-availability")}
+          onPress={() => router.push("/(main_screen)/user-profile")}
         />
       </View>
     </View>

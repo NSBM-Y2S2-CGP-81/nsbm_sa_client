@@ -1,20 +1,11 @@
-<<<<<<< HEAD
-// components/lectureScheduling/LectureAttendance.tsx
-=======
->>>>>>> cd4a1bb (Add LectureScheduleViewer and LectureAttendance components for lecture scheduling screen)
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React from "react";
+import { View, Text, StyleSheet } from "react-native";
 
 export default function LectureAttendance() {
-<<<<<<< HEAD
-  // We have dummy data for subjects and semester progress, but gotta make it to fetch it from the server
-=======
-  // Dummy attendance data
->>>>>>> cd4a1bb (Add LectureScheduleViewer and LectureAttendance components for lecture scheduling screen)
   const subjects = [
-    { id: 1, name: 'CS101', attendance: 72 },
-    { id: 2, name: 'CS102', attendance: 85 },
-    { id: 3, name: 'CS103', attendance: 68 },
+    { id: 1, name: "CS101", attendance: 72 },
+    { id: 2, name: "CS102", attendance: 85 },
+    { id: 3, name: "CS103", attendance: 68 },
   ];
 
   const semesterProgress = 60; // Example: 60% completed
@@ -28,10 +19,6 @@ export default function LectureAttendance() {
           <Text style={styles.subjectAttendance}>{subject.attendance}%</Text>
         </View>
       ))}
-<<<<<<< HEAD
-
-=======
->>>>>>> cd4a1bb (Add LectureScheduleViewer and LectureAttendance components for lecture scheduling screen)
       <View style={styles.progressBarContainer}>
         <Text style={styles.progressText}>Semester Progress</Text>
         <View style={styles.progressBar}>
@@ -48,13 +35,13 @@ const styles = StyleSheet.create({
   },
   heading: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 5,
   },
   subjectRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    backgroundColor: '#f4f4f4',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    backgroundColor: "#f4f4f4",
     padding: 10,
     marginBottom: 5,
     borderRadius: 4,
@@ -64,7 +51,7 @@ const styles = StyleSheet.create({
   },
   subjectAttendance: {
     fontSize: 16,
-    color: 'gray',
+    color: "gray",
   },
   progressBarContainer: {
     marginTop: 15,
@@ -75,12 +62,12 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     height: 10,
-    backgroundColor: '#ddd',
+    backgroundColor: "#ddd",
     borderRadius: 5,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   progress: {
-    height: '100%',
-    backgroundColor: '#76c7c0',
+    height: "100%",
+    backgroundColor: "#76c7c0",
   },
 });

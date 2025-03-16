@@ -14,12 +14,17 @@ import { Picker } from "@react-native-picker/picker";
 import SERVER_ADDRESS from "@/config";
 // import { useRouter, Stack } from "expo-router";
 import Toast from "react-native-toast-message"; // Add Toast library
-import { Stack } from "expo-router";
+import { Stack, router } from "expo-router";
 // import { ScrollView } from "react-native-reanimated/lib/typescript/Animated";
 
 const SignUpScreen = () => {
   // const router = useRouter();
   const [mail, setMail] = useState("");
+  const [studentid, setstudentid] = useState("");
+  const [intake, setintake] = useState("");
+  const [degree, setdegree] = useState("");
+  const [university, setuni] = useState("");
+  const [nic, setnic] = useState("");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [signType, setSignType] = useState("Student");
@@ -42,6 +47,11 @@ const SignUpScreen = () => {
       password: password,
       phone_number: phone,
       user_type: signType,
+      student_id: studentid,
+      intake: intake,
+      degree: degree,
+      university: university,
+      nic: nic,
       profile_picture:
         "https://www.vhv.rs/dpng/d/505-5058560_person-placeholder-image-free-hd-png-download.png",
       created_at: currentDateTime,
@@ -57,6 +67,7 @@ const SignUpScreen = () => {
       });
 
       if (response.status === 409) {
+        router.push("/(auth)/sign-in");
         throw new Error("User Already Exists");
       }
 
@@ -79,7 +90,7 @@ const SignUpScreen = () => {
 
       // console.error(apiKey);
 
-      // router.push("/"); // Navigate to the next screen after successful login
+      router.push("/"); // Navigate to the next screen after successful login
     } catch (error) {
       // console.error("Login error:", error);
       Toast.show({
@@ -110,6 +121,14 @@ const SignUpScreen = () => {
             onChangeText={setName}
           />
 
+          <CustomText style={styles.label}>Student ID: </CustomText>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter ID Here"
+            value={studentid}
+            onChangeText={setstudentid}
+          />
+
           <CustomText style={styles.label}>NSBM Email</CustomText>
           <TextInput
             style={styles.input}
@@ -125,6 +144,38 @@ const SignUpScreen = () => {
             secureTextEntry
             value={password}
             onChangeText={setPassword}
+          />
+
+          <CustomText style={styles.label}>Enter Intake Value: </CustomText>
+          <TextInput
+            style={styles.input}
+            placeholder="Eg: 24.1, 22.3, etc."
+            value={intake}
+            onChangeText={setintake}
+          />
+
+          <CustomText style={styles.label}>Enter your Degree : </CustomText>
+          <TextInput
+            style={styles.input}
+            placeholder="Computer Science, Business Management, etc."
+            value={degree}
+            onChangeText={setdegree}
+          />
+
+          <CustomText style={styles.label}>Offering University : </CustomText>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter Name Here"
+            value={university}
+            onChangeText={setuni}
+          />
+
+          <CustomText style={styles.label}>Enter Your NIC: </CustomText>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter NIC Here"
+            value={nic}
+            onChangeText={setnic}
           />
 
           <CustomText style={styles.label}>Phone Number</CustomText>

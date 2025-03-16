@@ -138,7 +138,7 @@ export default function HomeScreen() {
                 >
                   {index === 0
                     ? '"Connecting Campus Life, One App at a Time."'
-                    : "Clicks by Community"}
+                    : "DEVELOPMENT BUILD"}
                 </Text>
               </View>
             )}

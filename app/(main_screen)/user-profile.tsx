@@ -1,19 +1,65 @@
 import React, { useState } from "react";
-import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import TopNavigationComponent from "@/components/topNavigationComponent";
 import { ScrollView } from "react-native";
 
 const UserProfile = () => {
   // Initialize states without default values, allowing user input
-  const [studentId, setStudentId] = useState("123456");
-  const [intake, setIntake] = useState("2023");
-  const [name, setName] = useState("John Doe");
-  const [nsbmEmail, setNsbmEmail] = useState("john.doe@nsbm.ac.lk");
-  const [degree, setDegree] = useState("Computer Science");
-  const [offeredBy, setOfferedBy] = useState("NSBM");
-  const [nic, setNic] = useState("123456789V");
-  const [email, setEmail] = useState("john.doe@gmail.com");
-  const [mobile, setMobile] = useState("0771234567");
+  const [studentId, setStudentId] = useState("");
+  const [intake, setIntake] = useState("");
+  const [name, setName] = useState("");
+  const [nsbmEmail, setNsbmEmail] = useState("");
+  const [degree, setDegree] = useState("");
+  const [offeredBy, setOfferedBy] = useState("");
+  const [nic, setNic] = useState("");
+  const [email, setEmail] = useState("");
+  const [mobile, setMobile] = useState("");
+
+  // Retrieve user data from AsyncStorage
+  //
+  const getUserData = async () => {
+    try {
+      const studentId = await AsyncStorage.getItem("student_id");
+      const intake = await AsyncStorage.getItem("intake");
+      const name = await AsyncStorage.getItem("full_name");
+      const nsbmEmail = await AsyncStorage.getItem("email");
+      const degree = await AsyncStorage.getItem("degree");
+      const offeredBy = await AsyncStorage.getItem("university");
+      const nic = await AsyncStorage.getItem("nic");
+      const email = await AsyncStorage.getItem("email");
+      const mobile = await AsyncStorage.getItem("phone_number");
+      setStudentId(studentId);
+      setIntake(intake);
+      setName(name);
+      setNsbmEmail(nsbmEmail);
+      setDegree(degree);
+      setOfferedBy(offeredBy);
+      setNic(nic);
+      setEmail(email);
+      setMobile(mobile);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  };
+  getUserData(); // Call the function to retrieve user data
+
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.clear(); // Clear all AsyncStorage data
+      Alert.alert("Logged Out", "You have been logged out successfully.");
+      // Optionally, navigate to login screen or reset state
+    } catch (error) {
+      console.error("Error clearing AsyncStorage:", error);
+    }
+  };
 
   return (
     <>
@@ -29,17 +75,17 @@ const UserProfile = () => {
             style={styles.profileImage}
           />
           <View style={styles.infoContainer}>
-            <Text style={styles.textBox}>{studentId}</Text>
-            <Text style={styles.textBox}>{intake}</Text>
-            <Text style={styles.textBox}>{name}</Text>
-            <Text style={styles.textBox}>{nsbmEmail}</Text>
-            <Text style={styles.textBox}>{degree}</Text>
-            <Text style={styles.textBox}>{offeredBy}</Text>
-            <Text style={styles.textBox}>{nic}</Text>
-            <Text style={styles.textBox}>{email}</Text>
-            <Text style={styles.textBox}>{mobile}</Text>
+            <Text style={styles.textBox}>StudentID: {studentId}</Text>
+            <Text style={styles.textBox}>Intake: {intake}</Text>
+            <Text style={styles.textBox}>Name: {name}</Text>
+            <Text style={styles.textBox}>Email: {nsbmEmail}</Text>
+            <Text style={styles.textBox}>Degree: {degree}</Text>
+            <Text style={styles.textBox}>Offered By: {offeredBy}</Text>
+            <Text style={styles.textBox}>NIC: {nic}</Text>
+            <Text style={styles.textBox}>Email: {email}</Text>
+            <Text style={styles.textBox}>Mobile: {mobile}</Text>
           </View>
-          <TouchableOpacity style={styles.logoutButton}>
+          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
             <Text style={styles.logoutText}>Log Out</Text>
           </TouchableOpacity>
         </View>

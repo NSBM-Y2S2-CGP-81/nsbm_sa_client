@@ -1,35 +1,30 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Image } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  ScrollView,
+} from "react-native";
 import { Calendar } from "react-native-calendars";
 import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
-import TopNavigationComponent from "@/components/topNavigationComponent";
 import { Ionicons } from "@expo/vector-icons";
-import { ScrollView } from "react-native";
+import TopNavigationComponent from "@/components/topNavigationComponent";
 
 const CreateEventScreen = ({ navigation }) => {
   const [eventName, setEventName] = useState("");
   const [description, setDescription] = useState("");
   const [selectedDate, setSelectedDate] = useState(null);
   const [showCalendar, setShowCalendar] = useState(false);
-  const [location, setLocation] = useState("Select Here");
+  const [location, setLocation] = useState("");
   const [file, setFile] = useState(null);
   const [image, setImage] = useState(null);
-  const [showWarning, setShowWarning] = useState(false);
-
-  const handleDescriptionChange = (text) => {
-    const words = text.trim().split(/\s+/).length;
-    if (words > 100) {
-      setShowWarning(true);
-    } else {
-      setShowWarning(false);
-      setDescription(text);
-    }
-  };
 
   const pickDocument = async () => {
     let result = await DocumentPicker.getDocumentAsync({
-      type: ["application/pdf"],
+      type: ["image/jpeg", "image/png", "application/pdf"],
     });
     if (result.type !== "cancel") {
       setFile(result);
@@ -51,53 +46,17 @@ const CreateEventScreen = ({ navigation }) => {
   return (
     <>
       <TopNavigationComponent
-        title={"Create an Event"}
+        title={"Schedule an Event"}
         subtitle={""}
-        navigateTo={"/(main_screen)/service-menu"}
+        navigateTo={"/(main_screen)/event-list"}
       />
-      <ScrollView
-        // contentContainerStyle={{ flexGrow: 1 }}
-        style={{ flex: 1, padding: 0, backgroundColor: "#FFFFFF" }}
-      >
-        <View
-          style={{
-            backgroundColor: "white",
-            padding: 20,
-            // borderRadius: 10,
-            shadowColor: "#000",
-            shadowOpacity: 0.1,
-            // shadowRadius: 5,
-            // elevation: 5,
-          }}
-        >
+      <ScrollView style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
+        <View style={{ padding: 20 }}>
           <TouchableOpacity
             onPress={pickImage}
-            style={{ alignItems: "center", marginBottom: 15 }}
+            style={{ alignSelf: "flex-end", marginBottom: 10 }}
           >
-            {image ? (
-              <Image
-                source={{ uri: image }}
-                style={{ width: 100, height: 100, borderRadius: 10 }}
-              />
-            ) : (
-              <View
-                style={{
-                  backgroundColor: "#ddd",
-                  padding: 15,
-                  borderRadius: 10,
-                  flexDirection: "row",
-                  alignItems: "center",
-                }}
-              >
-                <Ionicons
-                  name="camera"
-                  size={24}
-                  color="black"
-                  style={{ marginRight: 10 }}
-                />
-                <Text>Pick an Image</Text>
-              </View>
-            )}
+            <Ionicons name="camera" size={24} color="black" />
           </TouchableOpacity>
 
           <TextInput
@@ -106,36 +65,38 @@ const CreateEventScreen = ({ navigation }) => {
             onChangeText={setEventName}
             style={{
               borderBottomWidth: 1,
-              marginBottom: 15,
-              paddingVertical: 5,
+              marginBottom: 10,
+              paddingVertical: 20,
             }}
           />
 
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <TextInput
-              placeholder="Description"
-              value={description}
-              onChangeText={handleDescriptionChange}
-              multiline
-              style={{
-                borderBottomWidth: 1,
-                marginBottom: 15,
-                flex: 1,
-                paddingVertical: 5,
-              }}
-            />
-            {showWarning && (
-              <Text style={{ color: "red", marginLeft: 5 }}>⚠️</Text>
-            )}
-          </View>
+          <TextInput
+            placeholder="Description"
+            value={description}
+            onChangeText={setDescription}
+            multiline
+            maxLength={100}
+            style={{
+              borderBottomWidth: 1,
+              marginBottom: 15,
+              paddingVertical: 20,
+            }}
+          />
 
+          <Text style={{ fontWeight: "100" }}> Select Date </Text>
           <TouchableOpacity
             onPress={() => setShowCalendar(!showCalendar)}
-            style={{ marginBottom: 15 }}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              padding: 10,
+              borderWidth: 1,
+              borderRadius: 8,
+              marginBottom: 10,
+            }}
           >
-            <Text style={{ fontSize: 16, fontWeight: "bold" }}>
-              {selectedDate ? selectedDate : "Select Date"}
-            </Text>
+            <Text style={{ flex: 1 }}>{selectedDate ? selectedDate : ""}</Text>
+            <Ionicons name="calendar" size={20} color="black" />
           </TouchableOpacity>
 
           {showCalendar && (
@@ -150,43 +111,48 @@ const CreateEventScreen = ({ navigation }) => {
             />
           )}
 
-          <TouchableOpacity
-            onPress={() => setLocation("Sample Location")}
-            style={{ marginBottom: 15 }}
+          <Text style={{ fontWeight: "100" }}> Select Location </Text>
+          <TextInput
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              padding: 10,
+              borderWidth: 1,
+              borderRadius: 8,
+              marginBottom: 10,
+            }}
           >
-            <Text style={{ fontSize: 16, fontWeight: "bold" }}>{location}</Text>
-          </TouchableOpacity>
+            <Text style={{ flex: 1 }}></Text>
+          </TextInput>
 
           <TouchableOpacity
             onPress={pickDocument}
             style={{
-              padding: 10,
-              backgroundColor: "#28A745",
-              borderRadius: 10,
+              flexDirection: "row",
               alignItems: "center",
+              backgroundColor: "#A3D8A5",
+              padding: 10,
+              borderRadius: 8,
               marginBottom: 10,
             }}
           >
-            <Text style={{ color: "white", fontSize: 16 }}>Attach File</Text>
+            <Ionicons
+              name="attach"
+              size={20}
+              color="white"
+              style={{ marginRight: 10 }}
+            />
+            <Text style={{ color: "white" }}>Attach File</Text>
           </TouchableOpacity>
 
-          {file && (
-            <Text style={{ fontSize: 14, color: "#555" }}>
-              Attached: {file.name}
-            </Text>
-          )}
+          {file && <Text>Attached: {file.name}</Text>}
 
           <TouchableOpacity
             style={{
-              marginTop: 20,
+              backgroundColor: "#34A853",
               padding: 15,
-              backgroundColor: "#007BFF",
               borderRadius: 10,
               alignItems: "center",
-              shadowColor: "#000",
-              shadowOpacity: 0.1,
-              shadowRadius: 5,
-              elevation: 3,
             }}
           >
             <Text style={{ color: "white", fontSize: 16, fontWeight: "bold" }}>

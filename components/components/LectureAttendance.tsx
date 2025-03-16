@@ -3,7 +3,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
 export default function LectureAttendance() {
-  // Dummy attendance data
+  // We have dummy data for subjects and semester progress, but gotta make it to fetch it from the server
   const subjects = [
     { id: 1, name: 'CS101', attendance: 72 },
     { id: 2, name: 'CS102', attendance: 85 },

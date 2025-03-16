@@ -1,51 +1,92 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import React, { useEffect, useRef } from "react";
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  Animated,
+} from "react-native";
 
-const SeatDisplayBox = ({ title, onPress }) => {
-  const [isPressed, setIsPressed] = useState(false);
+const SeatDisplayBox = ({ imageSource, title, seatAvailability, onPress }) => {
+  const seatCount = useRef(new Animated.Value(0)).current;
 
-  const handlePressIn = () => {
-    setIsPressed(true);
-  };
+  useEffect(() => {
+    Animated.timing(seatCount, {
+      toValue: seatAvailability,
+      duration: 1000, // animation duration in ms
+      useNativeDriver: false,
+    }).start();
+  }, [seatAvailability]);
 
-  const handlePressOut = () => {
-    setIsPressed(false);
-  };
+  const interpolatedCount = seatCount.interpolate({
+    inputRange: [0, seatAvailability],
+    outputRange: [0, seatAvailability],
+    extrapolate: "clamp",
+  });
 
   return (
-    <TouchableOpacity
-      onPress={onPress}
-      onPressIn={handlePressIn}
-      onPressOut={handlePressOut}
-      activeOpacity={0.7}
-    >
-      <View
-        style={[styles.box, { backgroundColor: isPressed ? "#555" : "#333" }]}
-      >
-        <Text style={styles.text}>{title}</Text>
+    <TouchableOpacity style={styles.container} onPress={onPress}>
+      <View style={styles.imageContainer}>
+        <Image source={imageSource} style={styles.image} />
+      </View>
+      <View style={styles.infoContainer}>
+        <Text style={styles.title}>{title}</Text>
+        <Animated.Text style={styles.seatNumber}>
+          {interpolatedCount}
+        </Animated.Text>
+        <Text style={styles.seatText}>Seat Availability</Text>
       </View>
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
-  box: {
-    width: 150,
-    height: 150,
+  container: {
+    flexDirection: "row",
+    backgroundColor: "#F3F4F6",
+    borderRadius: 10,
+    marginVertical: 10,
+    width: "95%",
+    height: "30%",
+    alignSelf: "center",
+    elevation: 2,
+  },
+  imageContainer: {
+    flex: 1.2,
+    borderTopLeftRadius: 10,
+    borderBottomLeftRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden",
+  },
+  image: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
+  },
+  infoContainer: {
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    alignSelf: "center",
-    borderRadius: 10,
-    elevation: 5,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
+    backgroundColor: "#E5E7EB",
+    borderTopRightRadius: 10,
+    borderBottomRightRadius: 10,
   },
-  text: {
-    color: "#fff",
+  title: {
     fontSize: 18,
-    fontWeight: "bold",
+    fontWeight: "300",
+    color: "#1F2937",
+    marginBottom: 8,
+  },
+  seatNumber: {
+    fontSize: 36,
+    fontWeight: "300",
+    color: "#374151",
+  },
+  seatText: {
+    fontSize: 14,
+    color: "#6B7280",
   },
 });
 

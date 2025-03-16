@@ -35,7 +35,7 @@ const SignInScreen = () => {
       });
 
       if (!response.ok) {
-        throw new Error("Login failed", response.statusText);
+        throw new Error(`Login failed: ${response.statusText}`);
       }
 
       const data = await response.json();
@@ -113,7 +113,7 @@ const SignInScreen = () => {
 
           <TouchableOpacity
             style={[styles.button, styles.googleButton]}
-            onPress={() => router.replace("/(auth)/sign-up.tsx")}
+            onPress={() => router.replace("/(auth)/sign-up")}
           >
             <CustomText style={styles.googlebuttonText}>Sign Up</CustomText>
           </TouchableOpacity>

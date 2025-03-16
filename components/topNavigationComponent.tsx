@@ -1,14 +1,19 @@
 // FacultyCard.js
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React from "react";
+import { View, Text, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { router } from 'expo-router';
+import { router } from "expo-router";
 
 const TopNavigationComponent = ({ title, subtitle, navigateTo }) => {
   return (
     <View style={styles.header}>
       <View style={styles.ServicesMenu}>
-        <Ionicons name="return-up-back" size={24} color="#1B5E20" onPress={() => router.push(navigateTo)} />
+        <Ionicons
+          name="return-up-back"
+          size={24}
+          color="#1B5E20"
+          onPress={() => router.push(navigateTo)}
+        />
       </View>
 
       <View style={styles.titleContainer}>
@@ -17,7 +22,12 @@ const TopNavigationComponent = ({ title, subtitle, navigateTo }) => {
       </View>
 
       <View style={styles.profileIcon}>
-        <Ionicons name="person" size={24} color="#1B5E20" onPress={() => router.push('/seat-availability')} />
+        <Ionicons
+          name="person"
+          size={24}
+          color="#1B5E20"
+          onPress={() => router.push("/seat-availability")}
+        />
       </View>
     </View>
   );
@@ -47,13 +57,13 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 18,
-    fontWeight: '300',
-    color: '#1B5E20',
+    fontWeight: "300",
+    color: "#1B5E20",
   },
   subtitle: {
     fontSize: 14,
     fontWeight: "300",
-    color: '#4CAF50',
+    color: "#4CAF50",
   },
   profileIcon: {
     alignItems: "center",

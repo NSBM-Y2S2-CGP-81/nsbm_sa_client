@@ -1,31 +1,27 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { WebView } from "react-native-webview";
-import { useRouter } from "expo-router";
-import Ionicons from "react-native-vector-icons/Ionicons";
+import { Stack } from "expo-router";
+import TopNavigationComponent from "@/components/topNavigationComponent";
+
 
 export default function UniversityMap() {
-  const router = useRouter();
 
   return (
-    <View style={styles.container}>
-      {/* Back Button */}
-      <Ionicons
-        name="arrow-back"
-        size={30}
-        color="#1B5E20"
-        style={styles.backButton}
-        onPress={() => router.back()}
+    <>
+    <Stack.Screen options={{ headerShown: false }} />
+    <TopNavigationComponent
+        title={"University Map"}
+        subtitle={""}
+        navigateTo={"/(main_screen)/service-menu"}
       />
-
-      <Text style={styles.title}>University Map</Text>
-
-      {/* Google Maps Embed */}
+    <View style={styles.container}>
       <WebView
-        source={{ uri: "https://www.google.com/maps?q=NSBM+Green+University" }}
+        source={{ uri: "https://www.google.com/maps?q=NSBM+Green+University&t=k" }}
         style={styles.map}
       />
     </View>
+    </>
   );
 }
 

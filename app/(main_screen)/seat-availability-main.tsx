@@ -83,25 +83,37 @@ export default function SeatStuff() {
       imageSource: require("@/assets/images/faculty_b.png"),
       title: "Faculty Of Business",
       subtitle: "(FOB)",
-      onPress: () => router.push("/seat-availability"),
+      onPress: () => {
+        router.push("/seat-availability");
+        AsyncStorage.setItem("fac_code", "fob");
+      },
     },
     {
       imageSource: require("@/assets/images/faculty_c.png"),
       title: "Faculty Of Computing",
-      subtitle: "(FOB)",
-      onPress: () => alert("Faculty Card Pressed"),
+      subtitle: "(FOC)",
+      onPress: () => {
+        router.push("/seat-availability");
+        AsyncStorage.setItem("fac_code", "foc");
+      },
     },
     {
       imageSource: require("@/assets/images/faculty_e.png"),
       title: "Faculty Of Engineering",
-      subtitle: "(FOB)",
-      onPress: () => alert("Faculty Card Pressed"),
+      subtitle: "(FOE)",
+      onPress: () => {
+        router.push("/seat-availability");
+        AsyncStorage.setItem("fac_code", "foe");
+      },
     },
     {
       imageSource: require("@/assets/images/library.png"),
       title: "Library",
       subtitle: "",
-      onPress: () => alert("Faculty Card Pressed"),
+      onPress: () => {
+        router.push("/seat-availability");
+        AsyncStorage.setItem("fac_code", "lib");
+      },
     },
   ];
 
@@ -111,7 +123,7 @@ export default function SeatStuff() {
       <TopNavigationComponent
         title={"Seat Availability"}
         subtitle={""}
-        navigateTo={"/"}
+        navigateTo={"/(main_screen)/service-menu"}
       />
       <ScrollView
         style={styles.container}

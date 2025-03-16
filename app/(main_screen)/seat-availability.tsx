@@ -33,9 +33,10 @@ const defaultDataWith6Colors = [
 
 export default function SeatStuff() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [newsData, setNewsData] = useState([]);
+  const [seatData, setSeatData] = useState([]);
   const [userData, setUserData] = useState([]);
   const progress = useSharedValue(0);
+  const [faculty, setFaculty] = useState([]);
 
   useEffect(() => {
     const validateLogin = async () => {
@@ -46,12 +47,6 @@ export default function SeatStuff() {
           if (stat == 2012) {
             console.log("Logged in");
             setIsLoggedIn(true);
-            const storedName = await AsyncStorage.getItem("full_name");
-            // setFullName(storedName || "User"); // Set full name state
-            // console.log("Name:", storedName);
-
-            const result = await fetchData("news", key);
-            setNewsData(result);
           } else {
             Toast.show({
               type: "error",
@@ -72,39 +67,61 @@ export default function SeatStuff() {
       }
     };
 
+    const calculateSeatAvailability = async () => {
+      try {
+        const api = await AsyncStorage.getItem("apiKey");
+        const fac_code = await AsyncStorage.getItem("fac_code");
+        setFaculty(fac_code);
+        console.log(fac_code);
+        const fetchedData = await fetchData("crowd_uplink", api);
+
+        if (Array.isArray(fetchedData) && fetchedData.length > 0) {
+          const apDataMap = new Map();
+
+          fetchedData.forEach((entry) => {
+            const existingEntry = apDataMap.get(entry.AP);
+            if (
+              !existingEntry ||
+              new Date(entry.timestamp) > new Date(existingEntry.timestamp)
+            ) {
+              apDataMap.set(entry.AP, entry);
+            }
+          });
+
+          const latestSeatData = Array.from(apDataMap.values());
+          setSeatData(latestSeatData);
+          console.log("Latest Seat Data:", latestSeatData);
+          // Toast.show({
+          //   type: "success",
+          //   position: "bottom",
+          //   text1: "Data Loaded Successfully!",
+          // });
+        }
+      } catch (error) {
+        console.log("Error fetching seat data:", error);
+        Toast.show({
+          type: "error",
+          position: "bottom",
+          text1: "Data Synchronization Failed!",
+        });
+      }
+    };
+
     validateLogin();
+    calculateSeatAvailability();
+
+    const interval = setInterval(() => {
+      console.log("Refreshing seat data...");
+      calculateSeatAvailability();
+    }, 30000); // Refresh every 30 seconds
+
+    return () => clearInterval(interval); // Cleanup interval on component unmount
   }, []);
 
   if (!isLoggedIn) {
     return null; // Avoid rendering anything if not logged in
+    router.push("/(auth)/sign-in");
   }
-
-  const facultyData = [
-    {
-      imageSource: require("@/assets/images/faculty_b.png"),
-      title: "Faculty Of Business",
-      subtitle: "(FOB)",
-      onPress: () => router.push("/seat-availability-main"),
-    },
-    {
-      imageSource: require("@/assets/images/faculty_c.png"),
-      title: "Faculty Of Computing",
-      subtitle: "(FOB)",
-      onPress: () => alert("Faculty Card Pressed"),
-    },
-    {
-      imageSource: require("@/assets/images/faculty_e.png"),
-      title: "Faculty Of Engineering",
-      subtitle: "(FOB)",
-      onPress: () => alert("Faculty Card Pressed"),
-    },
-    {
-      imageSource: require("@/assets/images/library.png"),
-      title: "Library",
-      subtitle: "",
-      onPress: () => alert("Faculty Card Pressed"),
-    },
-  ];
 
   return (
     <>
@@ -112,15 +129,38 @@ export default function SeatStuff() {
       <TopNavigationComponent
         title={"Seat Availability FOC"}
         subtitle={""}
-        navigateTo={"/"}
+        navigateTo={"/(main_screen)/seat-availability-main"}
       />
       <ScrollView
         style={styles.container}
         contentContainerStyle={styles.scrollContent}
       >
-        {facultyData.map((faculty, index) => (
-          <SeatDisplayBox />
-        ))}
+        {seatData.length > 0 ? (
+          seatData
+            .filter((entry) => entry.faculty === faculty)
+            .map((entry) => (
+              <SeatDisplayBox
+                key={entry._id}
+                imageSource={(() => {
+                  switch (entry.AP) {
+                    case "finagle":
+                      return require("@/assets/images/finagle.png");
+                    case "stdnt_center":
+                      return require("@/assets/images/stdc.png");
+                    // case "library":
+                    // return require("@/assets/images/library.png");
+                    // Add more cases as needed
+                    default:
+                      return require("@/assets/images/default.png");
+                  }
+                })()}
+                title={entry.name}
+                seatAvailability={entry.seats}
+              />
+            ))
+        ) : (
+          <Text>Loading seat data...</Text>
+        )}
       </ScrollView>
     </>
   );

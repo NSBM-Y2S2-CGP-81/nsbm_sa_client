@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Image,
   TextProps,
+  ScrollView,
 } from "react-native";
 import CustomText from "@/components/CustomText";
 import { Picker } from "@react-native-picker/picker";
@@ -14,6 +15,7 @@ import SERVER_ADDRESS from "@/config";
 // import { useRouter, Stack } from "expo-router";
 import Toast from "react-native-toast-message"; // Add Toast library
 import { Stack } from "expo-router";
+// import { ScrollView } from "react-native-reanimated/lib/typescript/Animated";
 
 const SignUpScreen = () => {
   // const router = useRouter();
@@ -84,14 +86,14 @@ const SignUpScreen = () => {
         type: "error",
         position: "top",
         text1: "Sign Up Failed",
-        text2: error,
+        text2: error instanceof Error ? error.message : String(error),
       });
     }
   };
 
   return (
     <View style={styles.container}>
-      {/* <Stack.Screen options={{ headerShown: false }} /> */}
+      <Stack.Screen options={{ headerShown: false }} />
       <Image
         source={require("../../assets/images/nsbm_logo.png")}
         style={styles.logo}
@@ -99,69 +101,71 @@ const SignUpScreen = () => {
       <CustomText style={styles.title}>Sign Up</CustomText>
 
       <View style={styles.form}>
-        <CustomText style={styles.label}>Full Name: </CustomText>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter Name Here"
-          value={name}
-          onChangeText={setName}
-        />
+        <ScrollView>
+          <CustomText style={styles.label}>Full Name: </CustomText>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter Name Here"
+            value={name}
+            onChangeText={setName}
+          />
 
-        <CustomText style={styles.label}>NSBM Email</CustomText>
-        <TextInput
-          style={styles.input}
-          placeholder="someone@students.nsbm.ac.lk"
-          value={mail}
-          onChangeText={setMail}
-        />
+          <CustomText style={styles.label}>NSBM Email</CustomText>
+          <TextInput
+            style={styles.input}
+            placeholder="someone@students.nsbm.ac.lk"
+            value={mail}
+            onChangeText={setMail}
+          />
 
-        <CustomText style={styles.label}>Password</CustomText>
-        <TextInput
-          style={styles.input}
-          placeholder="********"
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-        />
+          <CustomText style={styles.label}>Password</CustomText>
+          <TextInput
+            style={styles.input}
+            placeholder="********"
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
+          />
 
-        <CustomText style={styles.label}>Phone Number</CustomText>
-        <TextInput
-          style={styles.input}
-          placeholder="+94"
-          value={phone}
-          onChangeText={setPhoneNo}
-        />
+          <CustomText style={styles.label}>Phone Number</CustomText>
+          <TextInput
+            style={styles.input}
+            placeholder="+94"
+            value={phone}
+            onChangeText={setPhoneNo}
+          />
 
-        <CustomText style={styles.label}>
-          Are you a Student or a Lecturer?
-        </CustomText>
-        <View style={styles.pickerContainer}>
-          <Picker
-            selectedValue={signType}
-            onValueChange={(itemValue) => setSignType(itemValue)}
-            style={styles.picker}
-          >
-            <Picker.Item
-              style={styles.pickerItem}
-              label="Student"
-              value="Student"
-            />
-            <Picker.Item
-              style={styles.pickerItem}
-              label="Lecturer"
-              value="Lecturer"
-            />
-          </Picker>
-        </View>
+          <CustomText style={styles.label}>
+            Are you a Student or a Lecturer?
+          </CustomText>
+          <View style={styles.pickerContainer}>
+            <Picker
+              selectedValue={signType}
+              onValueChange={(itemValue) => setSignType(itemValue)}
+              style={styles.picker}
+            >
+              <Picker.Item
+                style={styles.pickerItem}
+                label="Student"
+                value="Student"
+              />
+              <Picker.Item
+                style={styles.pickerItem}
+                label="Lecturer"
+                value="Lecturer"
+              />
+            </Picker>
+          </View>
 
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={[styles.button, styles.signInButton]}
-            onPress={handleSignIn} // Trigger the login process
-          >
-            <CustomText style={styles.buttonText}>Sign Up</CustomText>
-          </TouchableOpacity>
-        </View>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={[styles.button, styles.signInButton]}
+              onPress={handleSignIn} // Trigger the login process
+            >
+              <CustomText style={styles.buttonText}>Sign Up</CustomText>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
       </View>
 
       {/* Add Toast container */}
@@ -194,6 +198,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     padding: 30,
     width: "100%",
+    height: "60%",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     marginTop: 20,

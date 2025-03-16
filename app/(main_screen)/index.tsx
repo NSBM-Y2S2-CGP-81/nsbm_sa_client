@@ -18,6 +18,7 @@ import Toast from "react-native-toast-message";
 import caraouselComponent from "@/components/textnimageCaraousel";
 import { Ionicons } from "@expo/vector-icons";
 import authRefresh from "../services/authRefreshService";
+import { AppProvider } from "@/app/services/GlobalContext";
 
 const width = Dimensions.get("window").width;
 const defaultDataWith6Colors = [
@@ -88,105 +89,107 @@ export default function HomeScreen() {
 
   return (
     <>
-      <Stack.Screen options={{ headerShown: false }} />
-      <ScrollView style={styles.container}>
-        <View style={styles.header}>
-          <View style={styles.ServicesMenu}>
-            <Ionicons
-              name="grid"
-              size={24}
-              color="#1B5E20"
-              onPress={() => router.push("/service-menu")}
-            />
-          </View>
-          <Text style={styles.greeting}>
-            Welcome back, {fullName.split(" ")[0] || "User"} !
-          </Text>
-          <View style={styles.profileIcon}>
-            <Ionicons
-              name="person"
-              size={24}
-              color="#1B5E20"
-              onPress={() => router.push("/(auth)/sign-in")}
-            />
-          </View>
-        </View>
-
-        <Carousel
-          mode="parallax"
-          width={width * 1}
-          height={width / 1.5}
-          data={images}
-          loop={true}
-          modeConfig={{
-            parallaxScrollingScale: 0.9,
-            parallaxScrollingOffset: 90,
-          }}
-          onProgressChange={(_, absoluteProgress) =>
-            (progress.value = absoluteProgress)
-          }
-          renderItem={({ item, index }) => (
-            <View style={styles.carouselItem}>
-              <Image source={{ uri: item }} style={styles.carouselImage} />
-              <Text
-                style={[
-                  styles.Headings,
-                  index === 0 && { fontStyle: "italic", fontWeight: "bold" },
-                ]}
-              >
-                {index === 0
-                  ? '"Connecting Campus Life, One App at a Time."'
-                  : "Clicks by Community"}
-              </Text>
+      <AppProvider>
+        <Stack.Screen options={{ headerShown: false }} />
+        <ScrollView style={styles.container}>
+          <View style={styles.header}>
+            <View style={styles.ServicesMenu}>
+              <Ionicons
+                name="grid"
+                size={24}
+                color="#1B5E20"
+                onPress={() => router.push("/service-menu")}
+              />
             </View>
-          )}
-        />
-        <Pagination.Basic
-          progress={progress}
-          data={images}
-          dotStyle={{ backgroundColor: "#AFD9AF", borderRadius: 100 }}
-          containerStyle={{ gap: 5, marginTop: 10 }}
-        />
+            <Text style={styles.greeting}>
+              Welcome back, {fullName.split(" ")[0] || "User"} !
+            </Text>
+            <View style={styles.profileIcon}>
+              <Ionicons
+                name="person"
+                size={24}
+                color="#1B5E20"
+                onPress={() => router.push("/(main_screen)/user-profile")}
+              />
+            </View>
+          </View>
 
-        <Text style={styles.sectionTitle}>Events & Stalls</Text>
-        <View style={styles.card}>
-          <Text style={styles.cardText}>
-            Oops... !, you caught us working on this
-          </Text>
-        </View>
+          <Carousel
+            mode="parallax"
+            width={width * 1}
+            height={width / 1.5}
+            data={images}
+            loop={true}
+            modeConfig={{
+              parallaxScrollingScale: 0.9,
+              parallaxScrollingOffset: 90,
+            }}
+            onProgressChange={(_, absoluteProgress) =>
+              (progress.value = absoluteProgress)
+            }
+            renderItem={({ item, index }) => (
+              <View style={styles.carouselItem}>
+                <Image source={{ uri: item }} style={styles.carouselImage} />
+                <Text
+                  style={[
+                    styles.Headings,
+                    index === 0 && { fontStyle: "italic", fontWeight: "bold" },
+                  ]}
+                >
+                  {index === 0
+                    ? '"Connecting Campus Life, One App at a Time."'
+                    : "Clicks by Community"}
+                </Text>
+              </View>
+            )}
+          />
+          <Pagination.Basic
+            progress={progress}
+            data={images}
+            dotStyle={{ backgroundColor: "#AFD9AF", borderRadius: 100 }}
+            containerStyle={{ gap: 5, marginTop: 10 }}
+          />
 
-        <Text style={styles.sectionTitle}>Latest News</Text>
-        <View>
-          {Array.isArray(newsData) && newsData.length > 0 ? (
-            <Carousel
-              mode="normal"
-              width={width * 1}
-              height={width / 1.2}
-              data={newsData}
-              loop={true}
-              modeConfig={{
-                parallaxScrollingScale: 1,
-                parallaxScrollingOffset: 100,
-              }}
-              renderItem={({ item }) => {
-                const base64Image = "data:image/jpeg;base64," + item.image;
-                return (
-                  <View style={styles.newsContainer}>
-                    <View style={styles.tintOverlay} />
-                    <Text style={styles.newsTitle}>{item.news_title}</Text>
-                    <Image
-                      source={{ uri: base64Image }}
-                      style={styles.newsCarouselImage}
-                    />
-                  </View>
-                );
-              }}
-            />
-          ) : (
-            <Text>No news available</Text>
-          )}
-        </View>
-      </ScrollView>
+          <Text style={styles.sectionTitle}>Events & Stalls</Text>
+          <View style={styles.card}>
+            <Text style={styles.cardText}>
+              Oops... !, you caught us working on this
+            </Text>
+          </View>
+
+          <Text style={styles.sectionTitle}>Latest News</Text>
+          <View>
+            {Array.isArray(newsData) && newsData.length > 0 ? (
+              <Carousel
+                mode="normal"
+                width={width * 1}
+                height={width / 1.2}
+                data={newsData}
+                loop={true}
+                modeConfig={{
+                  parallaxScrollingScale: 1,
+                  parallaxScrollingOffset: 100,
+                }}
+                renderItem={({ item }) => {
+                  const base64Image = "data:image/jpeg;base64," + item.image;
+                  return (
+                    <View style={styles.newsContainer}>
+                      <View style={styles.tintOverlay} />
+                      <Text style={styles.newsTitle}>{item.news_title}</Text>
+                      <Image
+                        source={{ uri: base64Image }}
+                        style={styles.newsCarouselImage}
+                      />
+                    </View>
+                  );
+                }}
+              />
+            ) : (
+              <Text>No news available</Text>
+            )}
+          </View>
+        </ScrollView>
+      </AppProvider>
     </>
   );
 }
@@ -247,7 +250,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   carouselImage: {
-    width: "90%",
+    width: "85%",
     height: "95%",
     borderRadius: 12,
   },

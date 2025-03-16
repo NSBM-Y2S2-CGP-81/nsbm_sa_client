@@ -19,37 +19,37 @@ const menuItems = [
   {
     title: "Events",
     icon: "calendar-alt",
-    color: "#4CAF50", // Light Green
-    navigateTo: "/(main_screeen)/events",
+    color: "#1B5E20", // Light Green
+    navigateTo: "/(main_screen)/event-list",
   },
   {
     title: "Lectures",
     icon: "chalkboard-teacher",
-    color: "#388E3C", // Medium Green
+    color: "#0E3A63", // Medium Green
     navigateTo: "/(main_screen)/lectures",
   },
   {
     title: "Food",
     icon: "utensils",
-    color: "#2C6B3D", // Dark Green
+    color: "#2A6A6C", // Dark Green
     navigateTo: "/(main_screen)/food",
   },
   {
     title: "University Map",
     icon: "map-marked-alt",
-    color: "#8BC34A", // Light Green with a yellowish tint
+    color: "#3C78D8", // Light Green with a yellowish tint
     navigateTo: "/(main_screen)/map",
   },
   {
     title: "Seat Availability",
     icon: "chair",
-    color: "#66BB6A", // Vibrant Green
+    color: "#A35324", // Vibrant Green
     navigateTo: "/(main_screen)/seat-availability-main",
   },
   {
     title: "Profile",
     icon: "user",
-    color: "#81C784", // Muted Green
+    color: "#5D85C2", // Muted Green
     navigateTo: "/(main_screen)/profile",
   },
   {
@@ -84,17 +84,17 @@ export default function ServiceMenu() {
   return (
     <>
       <Stack.Screen options={{ headerShown: false }} />
-      <TopNavigationComponent
+      {/* <TopNavigationComponent
         title={"Welcome to Services"}
         subtitle={""}
         navigateTo={"/"}
-      />
+      /> */}
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.gridContainer}>
           {menuItems.map((item, index) => (
             <TouchableOpacity
               key={index}
-              onPress={() => router.push(item.navigateTo)} // Handle navigation on press
+              onPress={() => router.push(item.navigateTo as any)} // Handle navigation on press
             >
               <Animated.View
                 style={[
@@ -151,11 +151,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "center",
-    width: width * 0.95,
+    width: width * 0.96,
   },
   tile: {
     width: width * 0.45,
-    height: height * 0.2,
+    height: height * 0.22,
     margin: 5,
     borderRadius: 10,
     alignItems: "center",

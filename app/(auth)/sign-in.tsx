@@ -83,15 +83,29 @@ const SignInScreen = () => {
       });
 
       router.replace("/");
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Login error:", error);
-      Toast.show({
-        type: "error",
-        position: "top",
-        text1: "Login Failed",
-        text2: error.message || "An error occurred. Please try again.",
-      });
+    
+      // Type guard to check if the error is an instance of Error
+      if (error instanceof Error) {
+        Toast.show({
+          type: "error",
+          position: "top",
+          text1: "Login Failed",
+          text2: error.message || "An error occurred. Please try again.", // Now 'message' can safely be accessed
+        });
+      } else {
+        // In case the error is not an instance of Error, handle it gracefully
+        Toast.show({
+          type: "error",
+          position: "top",
+          text1: "Login Failed",
+          text2: "An unknown error occurred. Please try again.",
+        });
+      }
     }
+  
+
   };
 
   return (

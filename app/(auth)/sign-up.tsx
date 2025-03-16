@@ -6,31 +6,45 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
-  TextProps,
   ScrollView,
 } from "react-native";
 import CustomText from "@/components/CustomText";
 import { Picker } from "@react-native-picker/picker";
 import SERVER_ADDRESS from "@/config";
-// import { useRouter, Stack } from "expo-router";
 import Toast from "react-native-toast-message"; // Add Toast library
 import { Stack, router } from "expo-router";
-// import { ScrollView } from "react-native-reanimated/lib/typescript/Animated";
 
-const SignUpScreen = () => {
-  // const router = useRouter();
-  const [mail, setMail] = useState("");
-  const [studentid, setstudentid] = useState("");
-  const [intake, setintake] = useState("");
-  const [degree, setdegree] = useState("");
-  const [university, setuni] = useState("");
-  const [nic, setnic] = useState("");
-  const [name, setName] = useState("");
-  const [password, setPassword] = useState("");
-  const [signType, setSignType] = useState("Student");
-  const [phone, setPhoneNo] = useState("");
+interface Credentials {
+  full_name: string;
+  email: string;
+  password: string;
+  phone_number: string;
+  user_type: string;
+  student_id: string;
+  intake: string;
+  degree: string;
+  university: string;
+  nic: string;
+  profile_picture: string;
+  created_at: string;
+  updated_at: string;
+}
 
-  const storeData = async (key, value) => {
+const SignUpScreen: React.FC = () => {
+  const [mail, setMail] = useState<string>("");
+  const [studentid, setStudentId] = useState<string>("");
+  const [intake, setIntake] = useState<string>("");
+  const [degree, setDegree] = useState<string>("");
+  const [university, setUniversity] = useState<string>("");
+  const [nic, setNic] = useState<string>("");
+  const [name, setName] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [signType, setSignType] = useState<string>("Student");
+  const [phone, setPhoneNo] = useState<string>("");
+  const [faculty, setFaculty] = useState<string>("");
+  const [availableDegrees, setAvailableDegrees] = useState<string[]>([]);
+
+  const storeData = async (key: string, value: string) => {
     try {
       await AsyncStorage.setItem(key, value);
       console.log("Data stored successfully");
@@ -41,7 +55,7 @@ const SignUpScreen = () => {
 
   const handleSignIn = async () => {
     const currentDateTime = new Date().toISOString();
-    const credentials = {
+    const credentials: Credentials = {
       full_name: name,
       email: mail,
       password: password,
@@ -57,6 +71,7 @@ const SignUpScreen = () => {
       created_at: currentDateTime,
       updated_at: currentDateTime,
     };
+
     try {
       const response = await fetch(`${SERVER_ADDRESS}/auth/register`, {
         method: "POST",
@@ -88,17 +103,54 @@ const SignUpScreen = () => {
       storeData("user_type", signType);
       storeData("password", password);
 
-      // console.error(apiKey);
-
       router.push("/"); // Navigate to the next screen after successful login
     } catch (error) {
-      // console.error("Login error:", error);
       Toast.show({
         type: "error",
         position: "top",
         text1: "Sign Up Failed",
         text2: error instanceof Error ? error.message : String(error),
       });
+    }
+  };
+
+  const handleFacultyChange = (faculty: string) => {
+    setFaculty(faculty);
+
+    switch (faculty) {
+      case "Faculty of Computing":
+        setAvailableDegrees([
+          "Computer Science",
+          "Computer Networks",
+          "Computer Security",
+          "Software Engineering",
+        ]);
+        break;
+      case "Faculty of Business":
+        setAvailableDegrees([
+          "Business Management",
+          "Logistics",
+          "Business Analytics",
+        ]);
+        break;
+      case "Faculty of Engineering":
+        setAvailableDegrees([
+          "Computer System Engineering",
+          "Civil Engineering",
+          "Mechanical Engineering",
+          "Mechatronics Engineering",
+        ]);
+        break;
+      case "Faculty of Science":
+        setAvailableDegrees([
+          "Nursing",
+          "BMS",
+          "Food and Nutrition",
+          "Psychology",
+        ]);
+        break;
+      default:
+        setAvailableDegrees([]);
     }
   };
 
@@ -126,7 +178,7 @@ const SignUpScreen = () => {
             style={styles.input}
             placeholder="Enter ID Here"
             value={studentid}
-            onChangeText={setstudentid}
+            onChangeText={setStudentId}
           />
 
           <CustomText style={styles.label}>NSBM Email</CustomText>
@@ -147,35 +199,59 @@ const SignUpScreen = () => {
           />
 
           <CustomText style={styles.label}>Enter Intake Value: </CustomText>
-          <TextInput
-            style={styles.input}
-            placeholder="Eg: 24.1, 22.3, etc."
-            value={intake}
-            onChangeText={setintake}
-          />
+          <Picker
+            selectedValue={intake}
+            onValueChange={(itemValue) => setIntake(itemValue)}
+            style={styles.picker}
+          >
+            {["22.1", "22.2", "23.1", "23.2", "24.1", "24.2", "24.3"].map(
+              (item) => (
+                <Picker.Item key={item} label={item} value={item} />
+              )
+            )}
+          </Picker>
 
-          <CustomText style={styles.label}>Enter your Degree : </CustomText>
-          <TextInput
-            style={styles.input}
-            placeholder="Computer Science, Business Management, etc."
-            value={degree}
-            onChangeText={setdegree}
-          />
+          <CustomText style={styles.label}>Faculty</CustomText>
+          <Picker
+            selectedValue={faculty}
+            onValueChange={(itemValue) => handleFacultyChange(itemValue)}
+            style={styles.picker}
+          >
+            <Picker.Item label="Faculty of Computing" value="Faculty of Computing" />
+            <Picker.Item label="Faculty of Business" value="Faculty of Business" />
+            <Picker.Item label="Faculty of Engineering" value="Faculty of Engineering" />
+            <Picker.Item label="Faculty of Science" value="Faculty of Science" />
+          </Picker>
 
-          <CustomText style={styles.label}>Offering University : </CustomText>
+          <CustomText style={styles.label}>Enter Your Degree:</CustomText>
+          <Picker
+            selectedValue={degree}
+            onValueChange={(itemValue) => setDegree(itemValue)}
+            style={styles.picker}
+          >
+            {availableDegrees.map((degreeOption) => (
+              <Picker.Item
+                key={degreeOption}
+                label={degreeOption}
+                value={degreeOption}
+              />
+            ))}
+          </Picker>
+
+          <CustomText style={styles.label}>Offering University:</CustomText>
           <TextInput
             style={styles.input}
-            placeholder="Enter Name Here"
+            placeholder="Enter University Name Here"
             value={university}
-            onChangeText={setuni}
+            onChangeText={setUniversity}
           />
 
-          <CustomText style={styles.label}>Enter Your NIC: </CustomText>
+          <CustomText style={styles.label}>Enter Your NIC:</CustomText>
           <TextInput
             style={styles.input}
             placeholder="Enter NIC Here"
             value={nic}
-            onChangeText={setnic}
+            onChangeText={setNic}
           />
 
           <CustomText style={styles.label}>Phone Number</CustomText>
@@ -186,32 +262,20 @@ const SignUpScreen = () => {
             onChangeText={setPhoneNo}
           />
 
-          <CustomText style={styles.label}>
-            Are you a Student or a Lecturer?
-          </CustomText>
-          <View style={styles.pickerContainer}>
-            <Picker
-              selectedValue={signType}
-              onValueChange={(itemValue) => setSignType(itemValue)}
-              style={styles.picker}
-            >
-              <Picker.Item
-                style={styles.pickerItem}
-                label="Student"
-                value="Student"
-              />
-              <Picker.Item
-                style={styles.pickerItem}
-                label="Lecturer"
-                value="Lecturer"
-              />
-            </Picker>
-          </View>
+          <CustomText style={styles.label}>Are you a Student or a Lecturer?</CustomText>
+          <Picker
+            selectedValue={signType}
+            onValueChange={(itemValue) => setSignType(itemValue)}
+            style={styles.picker}
+          >
+            <Picker.Item label="Student" value="Student" />
+            <Picker.Item label="Lecturer" value="Lecturer" />
+          </Picker>
 
           <View style={styles.buttonContainer}>
             <TouchableOpacity
               style={[styles.button, styles.signInButton]}
-              onPress={handleSignIn} // Trigger the login process
+              onPress={handleSignIn}
             >
               <CustomText style={styles.buttonText}>Sign Up</CustomText>
             </TouchableOpacity>
@@ -219,7 +283,6 @@ const SignUpScreen = () => {
         </ScrollView>
       </View>
 
-      {/* Add Toast container */}
       <Toast />
     </View>
   );
@@ -285,39 +348,14 @@ const styles = StyleSheet.create({
     backgroundColor: "#39B54A",
     marginRight: 5,
   },
-  googleButton: {
-    backgroundColor: "#D6E1ED",
-    marginLeft: 5,
-  },
   buttonText: {
     color: "#fff",
     fontWeight: "100",
     fontSize: 16,
   },
-  googlebuttonText: {
-    color: "#fff",
-    fontWeight: "100",
-    fontSize: 16,
-  },
-  forgotPassword: {
-    textAlign: "center",
-    color: "#4CAF50",
-    marginTop: 15,
-    fontWeight: "200",
-    fontSize: 14,
-  },
-  pickerContainer: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    backgroundColor: "#AFD9AF",
-    borderRadius: 10,
-  },
   picker: {
     height: 50,
     width: "100%",
-  },
-  pickerItem: {
-    fontWeight: "200",
   },
 });
 

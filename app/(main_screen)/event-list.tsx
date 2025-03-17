@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -9,32 +9,28 @@ import {
 import { Calendar } from "react-native-calendars";
 import { Stack, useRouter } from "expo-router";
 import CustomText from "@/components/CustomText";
-
+import fetchData from "../services/fetcher";
 import TopNavigationComponent from "@/components/topNavigationComponent";
 import EventSearchAndGallery from "@/components/eventsAndGallery";
-
-const events = [
-  {
-    title: "NSBM Green Fiesta 2025",
-    date: "2025-02-13",
-    time: "3PM",
-    venue: "Phase 1 Ground",
-    image: require("../../assets/images/green_fiesta.jpg"),
-  },
-  {
-    title: "NSBM Sports Fiesta 2025",
-    date: "2025-02-23",
-    time: "5PM",
-    venue: "Main Stadium",
-    image: require("../../assets/images/sports_fiesta.jpg"),
-  },
-];
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const EventList = () => {
-  const router = useRouter();
+  const [events, setEvents] = useState([]);
   const [markedDates, setMarkedDates] = useState<
     Record<string, { event: any }>
   >({});
+  const router = useRouter();
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      const key = await AsyncStorage.getItem("apiKey");
+      const result = await fetchData("events", key);
+      // console.log(result);
+      setEvents(result);
+    };
+
+    fetchEvents();
+  }, []);
 
   const handleEventSelection = (selectedDate: string, selectedEvent: any) => {
     if (!selectedDate) return;
@@ -48,10 +44,11 @@ const EventList = () => {
     router.push({
       pathname: "/(main_screen)/event-details",
       params: {
-        title: event.title,
-        date: event.date,
-        time: event.time,
-        venue: event.venue,
+        title: event.event_name,
+        date: event.event_date,
+        time: event.event_time,
+        venue: event.event_venue,
+        image: event.event_image,
       },
     });
   };
@@ -65,7 +62,7 @@ const EventList = () => {
         navigateTo={"/(main_screen)/service-menu"}
       />
       <ScrollView style={styles.container}>
-        <EventSearchAndGallery />
+        <EventSearchAndGallery events={events} />
 
         <TouchableOpacity
           onPress={() => router.replace("/(main_screen)/event-types")}
@@ -89,7 +86,7 @@ const EventList = () => {
                 </View>
               );
 
-            const event = events.find((e) => e.date === date.dateString);
+            const event = events.find((e) => e.event_date === date.dateString);
 
             return (
               <View style={styles.calendarDay}>
@@ -135,12 +132,9 @@ const styles = StyleSheet.create({
     backgroundColor: "rgb(144, 238, 144)",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    // shadowOpacity: 0.25,
-    // shadowRadius: 3.5,
-    // elevation: 5,
   },
   eventHighlighted: {
-    backgroundColor: "#FF7043", // Orange for highlighted event
+    backgroundColor: "#FF7043",
     borderWidth: 2,
     borderColor: "#FF5722",
   },

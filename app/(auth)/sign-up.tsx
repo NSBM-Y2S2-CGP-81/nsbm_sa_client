@@ -207,7 +207,7 @@ const SignUpScreen: React.FC = () => {
             {["22.1", "22.2", "23.1", "23.2", "24.1", "24.2", "24.3"].map(
               (item) => (
                 <Picker.Item key={item} label={item} value={item} />
-              )
+              ),
             )}
           </Picker>
 
@@ -217,10 +217,22 @@ const SignUpScreen: React.FC = () => {
             onValueChange={(itemValue) => handleFacultyChange(itemValue)}
             style={styles.picker}
           >
-            <Picker.Item label="Faculty of Computing" value="Faculty of Computing" />
-            <Picker.Item label="Faculty of Business" value="Faculty of Business" />
-            <Picker.Item label="Faculty of Engineering" value="Faculty of Engineering" />
-            <Picker.Item label="Faculty of Science" value="Faculty of Science" />
+            <Picker.Item
+              label="Faculty of Computing"
+              value="Faculty of Computing"
+            />
+            <Picker.Item
+              label="Faculty of Business"
+              value="Faculty of Business"
+            />
+            <Picker.Item
+              label="Faculty of Engineering"
+              value="Faculty of Engineering"
+            />
+            <Picker.Item
+              label="Faculty of Science"
+              value="Faculty of Science"
+            />
           </Picker>
 
           <CustomText style={styles.label}>Enter Your Degree:</CustomText>
@@ -262,7 +274,9 @@ const SignUpScreen: React.FC = () => {
             onChangeText={setPhoneNo}
           />
 
-          <CustomText style={styles.label}>Are you a Student or a Lecturer?</CustomText>
+          <CustomText style={styles.label}>
+            Are you a Student or a Lecturer?
+          </CustomText>
           <Picker
             selectedValue={signType}
             onValueChange={(itemValue) => setSignType(itemValue)}

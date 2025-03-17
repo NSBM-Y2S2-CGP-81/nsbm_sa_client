@@ -3,11 +3,9 @@ import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import TopNavigationComponent from "@/components/topNavigationComponent";
 
-const placeholderImage =
-  "https://via.placeholder.com/300x200.png?text=No+Image+Available";
-
 const EventDetails: React.FC = () => {
   const params = useLocalSearchParams();
+  // console.log(params.image);
 
   const handleRegister = () => {
     alert("Registered successfully!"); // Replace with actual registration logic
@@ -23,7 +21,7 @@ const EventDetails: React.FC = () => {
       <View style={styles.container}>
         <View style={styles.card}>
           <Image
-            source={{ uri: params.image || placeholderImage }}
+            source={{ uri: `${params.image}` }}
             style={styles.eventImage}
           />
           <Text style={styles.eventTitle}>{params.title || "Event Title"}</Text>

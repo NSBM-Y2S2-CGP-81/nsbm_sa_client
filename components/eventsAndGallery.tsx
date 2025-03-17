@@ -9,22 +9,7 @@ import {
   Text,
 } from "react-native";
 
-const events = [
-  {
-    title: "NSBM Green Fiesta 2025",
-    image: require("@/assets/images/green_fiesta.jpg"),
-  },
-  {
-    title: "NSBM Sports Fiesta 2025",
-    image: require("@/assets/images/sports_fiesta.jpg"),
-  },
-  {
-    title: "Food Festival 2025",
-    image: require("@/assets/images/sports_fiesta.jpg"),
-  },
-];
-
-const EventSearchAndGallery = () => {
+export default function EventSearchAndGallery({ events }) {
   return (
     <View style={styles.container}>
       <TextInput
@@ -35,18 +20,23 @@ const EventSearchAndGallery = () => {
       <ScrollView horizontal style={styles.galleryContainer}>
         {events.map((event, index) => (
           <TouchableOpacity key={index} style={styles.eventCard}>
-            <Image source={event.image} style={styles.eventImage} />
-            <Text style={styles.galleryText}>Event Placeholder</Text>
+            <Image
+              source={{ uri: `${event.event_image}` }}
+              style={styles.eventImage}
+            />
+            <Text style={styles.galleryText}>{event.event_name}</Text>
           </TouchableOpacity>
         ))}
       </ScrollView>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
     padding: 2,
+    paddingLeft: 10,
+    paddingRight: 10,
   },
   searchBox: {
     height: 40,
@@ -63,11 +53,13 @@ const styles = StyleSheet.create({
   galleryText: {
     paddingTop: 10,
     fontWeight: "300",
+    textAlign: "center", // Ensures the text is centered under the image
+    flexWrap: "wrap", // Allows the title to wrap to the next line
+    width: 100, // Keeps the text container width fixed to match the image
   },
   eventCard: {
     marginRight: 10,
     borderRadius: 10,
-    // padding: 20,
     paddingTop: 5,
     paddingLeft: 5,
     paddingRight: 5,
@@ -75,8 +67,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     alignItems: "center",
     backgroundColor: "#D1EED5",
-    // borderWidth: 2,
-    // borderColor: "purple", // Highlight border (change as needed)
+    flex: 1,
   },
   eventImage: {
     borderRadius: 5,
@@ -84,5 +75,3 @@ const styles = StyleSheet.create({
     height: 100,
   },
 });
-
-export default EventSearchAndGallery;

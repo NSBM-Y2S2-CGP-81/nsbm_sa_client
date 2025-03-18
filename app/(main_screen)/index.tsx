@@ -40,6 +40,7 @@ export default function HomeScreen() {
   const progress = useSharedValue(0);
   const [fullName, setFullName] = useState("Loading...");
   const [loadingstate, setLoadingState] = useState(true);
+  const [events, setEvents] = useState([]);
 
   useEffect(() => {
     const validateLogin = async () => {
@@ -57,6 +58,8 @@ export default function HomeScreen() {
 
             const result = await fetchData("news", key);
             setNewsData(result);
+            const result_events = await fetchData("events", key);
+            setEvents(result_events);
             console.log(newsData);
           } else {
             Alert("Session Expired", "Please login again");
@@ -165,16 +168,15 @@ export default function HomeScreen() {
 
           <Text style={styles.sectionTitle}>Events & Stalls</Text>
           <ScrollView horizontal>
-            <EventsAndStallsScroller
-              heading="NSBM Green Fiesta"
-              subtitle="The University's Annual Sports Meet"
-              venues="NSBM Green University - Phase 2 Grounds"
-            />
-            <EventsAndStallsScroller
-              heading="NSBM Green Fiesta"
-              subtitle="The University's Annual Sports Meet"
-              venues="NSBM Green University - Phase 2 Grounds"
-            />
+            {events.map((event, index) => (
+              <EventsAndStallsScroller
+                key={index}
+                heading={event.event_name}
+                subtitle={event.event_venue}
+                venues={event.event_date}
+                image={event.event_image}
+              />
+            ))}
           </ScrollView>
 
           <Text style={styles.sectionTitle}>Latest News</Text>

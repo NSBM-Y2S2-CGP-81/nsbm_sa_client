@@ -20,6 +20,7 @@ import { Ionicons } from "@expo/vector-icons";
 import FacultyCard from "@/components/facultyCard";
 import TopNavigationComponent from "@/components/topNavigationComponent";
 import SeatDisplayBox from "@/components/seatDisplay";
+import Loading from "@/components/loader";
 
 const width = Dimensions.get("window").width;
 const defaultDataWith6Colors = [
@@ -37,6 +38,7 @@ export default function SeatStuff() {
   const [userData, setUserData] = useState([]);
   const progress = useSharedValue(0);
   const [faculty, setFaculty] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const validateLogin = async () => {
@@ -64,6 +66,8 @@ export default function SeatStuff() {
           position: "bottom",
           text1: "System Experienced an Error !",
         });
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -117,6 +121,20 @@ export default function SeatStuff() {
 
     return () => clearInterval(interval); // Cleanup interval on component unmount
   }, []);
+
+  if (loading) {
+    return (
+      <>
+        <Stack.Screen options={{ headerShown: false }} />
+        <TopNavigationComponent
+          title={"Seat Availability FOC"}
+          subtitle={""}
+          navigateTo={"/(main_screen)/seat-availability-main"}
+        />
+        <Loading />
+      </>
+    );
+  }
 
   if (!isLoggedIn) {
     return null; // Avoid rendering anything if not logged in

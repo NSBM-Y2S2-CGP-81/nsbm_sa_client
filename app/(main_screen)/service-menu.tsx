@@ -26,7 +26,7 @@ const menuItems = [
     title: "Lectures",
     icon: "chalkboard-teacher",
     color: "#0E3A63", // Medium Green
-    navigateTo: "/(main_screen)/lectures",
+    navigateTo: "/(main_screen)/lecture-scheduling",
   },
   {
     title: "Food",
@@ -63,10 +63,8 @@ const menuItems = [
 ];
 
 export default function ServiceMenu() {
-  const router = useRouter(); // Get the router for navigation
-  const animations = useRef(
-    menuItems.map(() => new Animated.Value(0)), // Initialize an array of animated values
-  ).current;
+  const router = useRouter();
+  const animations = useRef(menuItems.map(() => new Animated.Value(0))).current;
 
   useEffect(() => {
     Animated.stagger(
@@ -78,7 +76,7 @@ export default function ServiceMenu() {
           useNativeDriver: true,
         }),
       ),
-    ).start(); // Start all animations with a staggered effect
+    ).start();
   }, []);
 
   return (

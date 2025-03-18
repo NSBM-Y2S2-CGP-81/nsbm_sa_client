@@ -5,6 +5,7 @@ import TopNavigationComponent from "@/components/topNavigationComponent";
 
 const EventDetails: React.FC = () => {
   const params = useLocalSearchParams();
+  // const [loading, setLoading] = React.useState(true);
   // console.log(params.image);
 
   const handleRegister = () => {

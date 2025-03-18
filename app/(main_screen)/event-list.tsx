@@ -5,6 +5,7 @@ import {
   ScrollView,
   TouchableOpacity,
   StyleSheet,
+  ActivityIndicator,
 } from "react-native";
 import { Calendar } from "react-native-calendars";
 import { Stack, useRouter } from "expo-router";
@@ -19,14 +20,21 @@ const EventList = () => {
   const [markedDates, setMarkedDates] = useState<
     Record<string, { event: any }>
   >({});
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
     const fetchEvents = async () => {
-      const key = await AsyncStorage.getItem("apiKey");
-      const result = await fetchData("events", key);
-      // console.log(result);
-      setEvents(result);
+      setLoading(true);
+      try {
+        const key = await AsyncStorage.getItem("apiKey");
+        const result = await fetchData("events", key);
+        setEvents(result);
+      } catch (error) {
+        console.error("Error fetching events:", error);
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchEvents();
@@ -61,59 +69,70 @@ const EventList = () => {
         subtitle={""}
         navigateTo={"/(main_screen)/service-menu"}
       />
-      <ScrollView style={styles.container}>
-        <EventSearchAndGallery events={events} />
+      {loading ? (
+        <View style={styles.loaderContainer}>
+          <ActivityIndicator size="large" color="#1B5E20" />
+          <Text style={styles.loadingText}>Fetching Event Details...</Text>
+        </View>
+      ) : (
+        <ScrollView style={styles.container}>
+          <EventSearchAndGallery events={events} />
 
-        <TouchableOpacity
-          onPress={() => router.replace("/(main_screen)/event-types")}
-        >
-          <CustomText style={styles.seeMore}>See More</CustomText>
-        </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => router.replace("/(main_screen)/event-types")}
+          >
+            <CustomText style={styles.seeMore}>See More</CustomText>
+          </TouchableOpacity>
 
-        <Calendar
-          markedDates={markedDates}
-          onDayPress={(day) => {
-            const selectedEvent = events.find((e) => e.date === day.dateString);
-            if (selectedEvent) {
-              goToEventDetails(selectedEvent);
-            }
-          }}
-          dayComponent={({ date, state }) => {
-            if (!date?.dateString)
-              return (
-                <View>
-                  <Text>-</Text>
-                </View>
+          <Calendar
+            markedDates={markedDates}
+            onDayPress={(day) => {
+              const selectedEvent = events.find(
+                (e) => e.date === day.dateString,
+              );
+              if (selectedEvent) {
+                goToEventDetails(selectedEvent);
+              }
+            }}
+            dayComponent={({ date, state }) => {
+              if (!date?.dateString)
+                return (
+                  <View>
+                    <Text>-</Text>
+                  </View>
+                );
+
+              const event = events.find(
+                (e) => e.event_date === date.dateString,
               );
 
-            const event = events.find((e) => e.event_date === date.dateString);
-
-            return (
-              <View style={styles.calendarDay}>
-                <TouchableOpacity
-                  onPress={() => event && goToEventDetails(event)}
-                >
-                  <View
-                    style={[
-                      styles.eventCircle,
-                      event ? styles.eventHighlighted : {},
-                    ]}
+              return (
+                <View style={styles.calendarDay}>
+                  <TouchableOpacity
+                    onPress={() => event && goToEventDetails(event)}
                   >
-                    <Text
+                    <View
                       style={[
-                        styles.calendarText,
-                        state === "disabled" ? { color: "gray" } : {},
+                        styles.eventCircle,
+                        event ? styles.eventHighlighted : {},
                       ]}
                     >
-                      {date.day ?? "-"}
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-              </View>
-            );
-          }}
-        />
-      </ScrollView>
+                      <Text
+                        style={[
+                          styles.calendarText,
+                          state === "disabled" ? { color: "gray" } : {},
+                        ]}
+                      >
+                        {date.day ?? "-"}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                </View>
+              );
+            }}
+          />
+        </ScrollView>
+      )}
     </>
   );
 };
@@ -122,6 +141,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#FFFFFF",
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#1B5E20",
   },
   eventCircle: {
     width: 40,

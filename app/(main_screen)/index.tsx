@@ -19,6 +19,9 @@ import caraouselComponent from "@/components/textnimageCaraousel";
 import { Ionicons } from "@expo/vector-icons";
 import authRefresh from "../services/authRefreshService";
 import { AppProvider } from "@/app/services/GlobalContext";
+import { Alert } from "react-native";
+import EventsAndStallsScroller from "@/components/events_n_stalls_idex";
+import Loading from "@/components/loader";
 
 const width = Dimensions.get("window").width;
 const defaultDataWith6Colors = [
@@ -36,6 +39,7 @@ export default function HomeScreen() {
   const [userData, setUserData] = useState([]);
   const progress = useSharedValue(0);
   const [fullName, setFullName] = useState("Loading...");
+  const [loadingstate, setLoadingState] = useState(true);
 
   useEffect(() => {
     const validateLogin = async () => {
@@ -48,16 +52,15 @@ export default function HomeScreen() {
             setIsLoggedIn(true);
             const storedName = await AsyncStorage.getItem("full_name");
             setFullName(storedName || "User"); // Set full name state
+            // setLoadingState(false);
             // console.log("Name:", storedName);
 
             const result = await fetchData("news", key);
             setNewsData(result);
+            console.log(newsData);
           } else {
-            Toast.show({
-              type: "error",
-              position: "bottom",
-              text1: "Session Expired !",
-            });
+            Alert("Session Expired", "Please login again");
+            router.replace("/(auth)/sign-in");
           }
         } else {
           router.replace("/(auth)/sign-in");
@@ -69,11 +72,22 @@ export default function HomeScreen() {
           position: "bottom",
           text1: "System Experienced an Error !",
         });
+      } finally {
+        setLoadingState(false);
       }
     };
 
     validateLogin();
   }, []);
+
+  if (loadingstate) {
+    return (
+      <>
+        <Stack.Screen options={{ headerShown: false }} />
+        <Loading message="Hang in there..." />
+      </>
+    );
+  }
 
   if (!isLoggedIn) {
     return null; // Avoid rendering anything if not logged in
@@ -91,29 +105,28 @@ export default function HomeScreen() {
     <>
       <AppProvider>
         <Stack.Screen options={{ headerShown: false }} />
-        <ScrollView style={styles.container}>
-          <View style={styles.header}>
-            <View style={styles.ServicesMenu}>
-              <Ionicons
-                name="grid"
-                size={24}
-                color="#1B5E20"
-                onPress={() => router.push("/service-menu")}
-              />
-            </View>
-            <Text style={styles.greeting}>
-              Welcome back, {fullName.split(" ")[0] || "User"} !
-            </Text>
-            <View style={styles.profileIcon}>
-              <Ionicons
-                name="person"
-                size={24}
-                color="#1B5E20"
-                onPress={() => router.push("/(main_screen)/user-profile")}
-              />
-            </View>
+        <View style={styles.header}>
+          <View style={styles.ServicesMenu}>
+            <Ionicons
+              name="grid"
+              size={24}
+              color="#1B5E20"
+              onPress={() => router.push("/service-menu")}
+            />
           </View>
-
+          <Text style={styles.greeting}>
+            Welcome back, {fullName.split(" ")[0] || "User"} !
+          </Text>
+          <View style={styles.profileIcon}>
+            <Ionicons
+              name="person"
+              size={24}
+              color="#1B5E20"
+              onPress={() => router.push("/(main_screen)/user-profile")}
+            />
+          </View>
+        </View>
+        <ScrollView style={styles.container}>
           <Carousel
             mode="parallax"
             width={width * 1}
@@ -151,11 +164,18 @@ export default function HomeScreen() {
           />
 
           <Text style={styles.sectionTitle}>Events & Stalls</Text>
-          <View style={styles.card}>
-            <Text style={styles.cardText}>
-              Oops... !, you caught us working on this
-            </Text>
-          </View>
+          <ScrollView horizontal>
+            <EventsAndStallsScroller
+              heading="NSBM Green Fiesta"
+              subtitle="The University's Annual Sports Meet"
+              venues="NSBM Green University - Phase 2 Grounds"
+            />
+            <EventsAndStallsScroller
+              heading="NSBM Green Fiesta"
+              subtitle="The University's Annual Sports Meet"
+              venues="NSBM Green University - Phase 2 Grounds"
+            />
+          </ScrollView>
 
           <Text style={styles.sectionTitle}>Latest News</Text>
           <View>
@@ -185,7 +205,7 @@ export default function HomeScreen() {
                 }}
               />
             ) : (
-              <Text>No news available</Text>
+              <Text style={{ alignSelf: "center" }}>No news available</Text>
             )}
           </View>
         </ScrollView>
@@ -197,7 +217,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    position: "absolute",
+    // position: "absolute",
     backgroundColor: "#FFFFF",
   },
   header: {

@@ -1,23 +1,29 @@
-// app/lecture-scheduling.tsx
-import React from "react";
+import React, { useLayoutEffect } from "react";
 import { ScrollView, StyleSheet, Text } from "react-native";
-// import LectureScheduleViewer from "@/components/lectureScheduling/LectureScheduleViewer";
-// import LectureAttendance from "@/components/lectureScheduling/LectureAttendance";
-//
+import { useNavigation } from "@react-navigation/native";
 import LectureScheduleViewer from "@/components/lectureScheduling/LectureScheduleViewer";
 import LectureAttendance from "@/components/LectureAttendance";
+import TopNavigationComponent from "@/components/topNavigationComponent";
 
 export default function LectureSchedulingScreen() {
+  const navigation = useNavigation();
+
+  useLayoutEffect(() => {
+    navigation.setOptions({ headerShown: false });
+  }, [navigation]);
+
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Lecture Scheduling</Text>
-
-      {/* Display the calendar and lecture list */}
-      <LectureScheduleViewer />
-
-      {/* Display attendance details and progress */}
-      <LectureAttendance />
-    </ScrollView>
+    <>
+      <TopNavigationComponent
+        title={"Lecture Scheduling"}
+        subtitle={""}
+        navigateTo={"/(main_screen)/service-menu"}
+      />
+      <ScrollView contentContainerStyle={styles.container}>
+        <LectureScheduleViewer />
+        <LectureAttendance />
+      </ScrollView>
+    </>
   );
 }
 

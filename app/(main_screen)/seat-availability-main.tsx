@@ -19,6 +19,7 @@ import caraouselComponent from "@/components/textnimageCaraousel";
 import { Ionicons } from "@expo/vector-icons";
 import FacultyCard from "@/components/facultyCard";
 import TopNavigationComponent from "@/components/topNavigationComponent";
+import Loading from "@/components/loader";
 
 const width = Dimensions.get("window").width;
 const defaultDataWith6Colors = [
@@ -34,6 +35,7 @@ export default function SeatStuff() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [newsData, setNewsData] = useState([]);
   const [userData, setUserData] = useState([]);
+  const [loading, setLoading] = useState(true);
   const progress = useSharedValue(0);
 
   useEffect(() => {
@@ -68,11 +70,27 @@ export default function SeatStuff() {
           position: "bottom",
           text1: "System Experienced an Error !",
         });
+      } finally {
+        setLoading(false);
       }
     };
 
     validateLogin();
   }, []);
+
+  if (loading) {
+    return (
+      <>
+        <Stack.Screen options={{ headerShown: false }} />
+        <TopNavigationComponent
+          title={"Seat Availability"}
+          subtitle={""}
+          navigateTo={"/(main_screen)/service-menu"}
+        />
+        <Loading />
+      </>
+    );
+  }
 
   if (!isLoggedIn) {
     return null; // Avoid rendering anything if not logged in

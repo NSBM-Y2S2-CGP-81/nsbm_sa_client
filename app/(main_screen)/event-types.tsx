@@ -46,7 +46,7 @@ const UpcomingEventsScreen = () => {
       <TopNavigationComponent
         title="Upcoming Events"
         subtitle=""
-        navigateTo="/(main_screen)/service-menu"
+        navigateTo="/(main_screen)/event-list"
       />
       {loading ? (
         <Loading />

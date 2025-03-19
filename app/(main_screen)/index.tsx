@@ -130,35 +130,38 @@ export default function HomeScreen() {
           </View>
         </View>
         <ScrollView style={styles.container}>
-          <Carousel
-            mode="parallax"
-            width={width * 1}
-            height={width / 1.5}
-            data={images}
-            loop={true}
-            modeConfig={{
-              parallaxScrollingScale: 0.9,
-              parallaxScrollingOffset: 90,
-            }}
-            onProgressChange={(_, absoluteProgress) =>
-              (progress.value = absoluteProgress)
-            }
-            renderItem={({ item, index }) => (
-              <View style={styles.carouselItem}>
-                <Image source={{ uri: item }} style={styles.carouselImage} />
-                <Text
-                  style={[
-                    styles.Headings,
-                    index === 0 && { fontStyle: "italic", fontWeight: "bold" },
-                  ]}
-                >
-                  {index === 0
-                    ? '"Connecting Campus Life, One App at a Time."'
-                    : "DEVELOPMENT BUILD"}
-                </Text>
-              </View>
-            )}
-          />
+          const memoizedCarousel = useMemo(() => (
+            <Carousel
+              mode="parallax"
+              width={width}
+              height={width / 1.5}
+              data={images}
+              loop={true}
+              modeConfig={{
+                parallaxScrollingScale: 0.9,
+                parallaxScrollingOffset: 50, // Reduce offset for smoother performance
+              }}
+              onProgressChange={(_, absoluteProgress) =>
+                (progress.value = absoluteProgress)
+              }
+              renderItem={({ item, index }) => (
+                <View style={styles.carouselItem}>
+                  <Image source={{ uri: item }} style={styles.carouselImage} />
+                  <Text
+                    style={[
+                      styles.Headings,
+                      index === 0 && { fontStyle: "italic", fontWeight: "bold" },
+                    ]}
+                  >
+                    {index === 0
+                      ? '"Connecting Campus Life, One App at a Time."'
+                      : "DEVELOPMENT BUILD"}
+                  </Text>
+                </View>
+              )}
+            />
+          ), [images]); // Only re-render when images change
+
           <Pagination.Basic
             progress={progress}
             data={images}

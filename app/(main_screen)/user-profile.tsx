@@ -64,9 +64,9 @@ const UserProfile = () => {
   return (
     <>
       <TopNavigationComponent
-        title={"Seat Availability FOC"}
+        title={"User Profile"}
         subtitle={""}
-        navigateTo={"/(main_screen)/seat-availability-main"}
+        navigateTo={"/(main_screen)/"}
       />
       <ScrollView style={styles.container}>
         <View style={styles.profileContainer}>

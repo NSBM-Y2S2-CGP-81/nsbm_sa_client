@@ -50,7 +50,7 @@ const menuItems = [
     title: "Profile",
     icon: "user",
     color: "#5D85C2", // Muted Green
-    navigateTo: "/(main_screen)/profile",
+    navigateTo: "/(main_screen)/user-profile",
   },
   {
     title: "Home",

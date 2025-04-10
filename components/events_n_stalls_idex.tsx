@@ -1,5 +1,13 @@
 import React from "react";
-import { View, Text, StyleSheet, Image } from "react-native";
+import {
+  TouchableOpacity,
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  Vibration,
+} from "react-native";
+import { useRouter } from "expo-router";
 
 export default function EventsAndStallsScroller({
   heading,
@@ -7,6 +15,8 @@ export default function EventsAndStallsScroller({
   venues,
   image,
 }) {
+  const router = useRouter();
+
   return (
     <View style={styles.scrollContainer}>
       <View style={styles.card}>
@@ -48,7 +58,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: "100%",
     height: "100%",
-    opacity: 0.3, // Adjust opacity as needed
+    opacity: 0.3,
   },
   overlay: {
     flex: 1,
@@ -74,5 +84,19 @@ const styles = StyleSheet.create({
     fontWeight: "300",
     color: "#0D47A1",
     textAlign: "center",
+  },
+  viewInfoButton: {
+    position: "absolute",
+    bottom: 10,
+    right: 10,
+    backgroundColor: "#0D47A1",
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 5,
+  },
+  viewInfoText: {
+    color: "white",
+    fontSize: 14,
+    fontWeight: "600",
   },
 });

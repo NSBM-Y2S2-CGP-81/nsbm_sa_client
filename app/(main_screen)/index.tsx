@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Link, router } from "expo-router";
-
 import {
   StyleSheet,
   Text,
@@ -8,6 +7,8 @@ import {
   ScrollView,
   Dimensions,
   Image,
+  Vibration,
+  TouchableOpacity,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Carousel, { Pagination } from "react-native-reanimated-carousel";
@@ -15,23 +16,18 @@ import { useSharedValue } from "react-native-reanimated";
 import { Stack } from "expo-router";
 import fetchData from "../services/fetcher";
 import Toast from "react-native-toast-message";
-import caraouselComponent from "@/components/textnimageCaraousel";
+// import caraouselComponent from "@/components/textnimageCaraousel";
 import { Ionicons } from "@expo/vector-icons";
 import authRefresh from "../services/authRefreshService";
 import { AppProvider } from "@/app/services/GlobalContext";
 import { Alert } from "react-native";
 import EventsAndStallsScroller from "@/components/events_n_stalls_idex";
 import Loading from "@/components/loader";
+import FastImage from "react-native-fast-image";
+// import { TouchableOpacity } from "react-native-gesture-handler";
+// import { TouchableOpacityComponent } from "react-native";
 
 const width = Dimensions.get("window").width;
-const defaultDataWith6Colors = [
-  "#B0604D",
-  "#899F9C",
-  "#B3C680",
-  "#5C6265",
-  "#F5D399",
-  "#F1F1F1",
-];
 
 export default function HomeScreen() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -60,7 +56,7 @@ export default function HomeScreen() {
             setNewsData(result);
             const result_events = await fetchData("events", key);
             setEvents(result_events);
-            console.log(newsData);
+            // console.log(newsData);
           } else {
             Alert("Session Expired", "Please login again");
             router.replace("/(auth)/sign-in");
@@ -92,6 +88,11 @@ export default function HomeScreen() {
     );
   }
 
+  const handlePress = () => {
+    Vibration.vibrate(10); // Vibrate for 100ms
+    router.push("/event-list"); // Change to your desired route
+  };
+
   if (!isLoggedIn) {
     return null; // Avoid rendering anything if not logged in
   }
@@ -114,7 +115,10 @@ export default function HomeScreen() {
               name="grid"
               size={24}
               color="#1B5E20"
-              onPress={() => router.push("/service-menu")}
+              onPress={() => {
+                Vibration.vibrate(10);
+                router.push("/service-menu");
+              }}
             />
           </View>
           <Text style={styles.greeting}>
@@ -125,43 +129,47 @@ export default function HomeScreen() {
               name="person"
               size={24}
               color="#1B5E20"
-              onPress={() => router.push("/(main_screen)/user-profile")}
+              onPress={() => {
+                Vibration.vibrate(10);
+                router.push("/(main_screen)/user-profile");
+              }}
             />
           </View>
         </View>
         <ScrollView style={styles.container}>
-          const memoizedCarousel = useMemo(() => (
-            <Carousel
-              mode="parallax"
-              width={width}
-              height={width / 1.5}
-              data={images}
-              loop={true}
-              modeConfig={{
-                parallaxScrollingScale: 0.9,
-                parallaxScrollingOffset: 50, // Reduce offset for smoother performance
-              }}
-              onProgressChange={(_, absoluteProgress) =>
-                (progress.value = absoluteProgress)
-              }
-              renderItem={({ item, index }) => (
-                <View style={styles.carouselItem}>
-                  <Image source={{ uri: item }} style={styles.carouselImage} />
-                  <Text
-                    style={[
-                      styles.Headings,
-                      index === 0 && { fontStyle: "italic", fontWeight: "bold" },
-                    ]}
-                  >
-                    {index === 0
-                      ? '"Connecting Campus Life, One App at a Time."'
-                      : "DEVELOPMENT BUILD"}
-                  </Text>
-                </View>
-              )}
-            />
-          ), [images]); // Only re-render when images change
-
+          <Carousel
+            mode="parallax"
+            width={width}
+            height={width / 1.5}
+            data={images}
+            loop={true}
+            modeConfig={{
+              parallaxScrollingScale: 0.9,
+              parallaxScrollingOffset: 90,
+            }}
+            onProgressChange={(_, absoluteProgress) =>
+              (progress.value = absoluteProgress)
+            }
+            renderItem={({ item, index }) => (
+              <View style={styles.carouselItem}>
+                <Image
+                  style={styles.carouselImage}
+                  source={{ uri: item }}
+                  resizeMode={FastImage.resizeMode.cover}
+                />
+                <Text
+                  style={[
+                    styles.Headings,
+                    index === 0 && { fontStyle: "italic", fontWeight: "bold" },
+                  ]}
+                >
+                  {index === 0
+                    ? '"Connecting Campus Life, One App at a Time."'
+                    : "Clicks by Community"}
+                </Text>
+              </View>
+            )}
+          />
           <Pagination.Basic
             progress={progress}
             data={images}
@@ -181,6 +189,11 @@ export default function HomeScreen() {
               />
             ))}
           </ScrollView>
+          <TouchableOpacity onPress={handlePress}>
+            <View style={styles.viewInfoButton}>
+              <Text>See More</Text>
+            </View>
+          </TouchableOpacity>
 
           <Text style={styles.sectionTitle}>Latest News</Text>
           <View>
@@ -202,7 +215,7 @@ export default function HomeScreen() {
                       <View style={styles.tintOverlay} />
                       <Text style={styles.newsTitle}>{item.news_title}</Text>
                       <Image
-                        source={{ uri: base64Image }}
+                        source={{ uri: item.image }}
                         style={styles.newsCarouselImage}
                       />
                     </View>
@@ -246,6 +259,17 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     color: "#1B5E20",
     justifyContent: "flex-end",
+  },
+  viewInfoButton: {
+    position: "absolute",
+    bottom: 10,
+    right: 15,
+    backgroundColor: "transparent",
+    paddingVertical: 5,
+    paddingHorizontal: 5,
+    borderRadius: 5,
+    borderWidth: 1, // Optional: add a border for visibility
+    borderColor: "#1B5E20", // Optional: color of the border
   },
   profileIcon: {
     alignItems: "center",

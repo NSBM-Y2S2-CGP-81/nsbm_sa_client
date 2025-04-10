@@ -10,11 +10,12 @@ import {
 } from "react-native";
 import { Calendar } from "react-native-calendars";
 import * as DocumentPicker from "expo-document-picker";
-import * as ImagePicker from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
 import TopNavigationComponent from "@/components/topNavigationComponent";
 import SERVER_ADDRESS from "@/config";
+import * as FileSystem from "expo-file-system";
+import { router } from "expo-router";
 
 const CreateEventScreen = ({ navigation }) => {
   const [eventName, setEventName] = useState("");
@@ -25,6 +26,7 @@ const CreateEventScreen = ({ navigation }) => {
   const [file, setFile] = useState(null);
   const [image, setImage] = useState(null);
   const [authToken, setAuthToken] = useState(null);
+  const [userEmail, setUserEmail] = useState(null);
 
   // Fetch the auth token from AsyncStorage
   useEffect(() => {
@@ -33,6 +35,8 @@ const CreateEventScreen = ({ navigation }) => {
         const token = await AsyncStorage.getItem("apiKey");
         console.log(token);
         if (token) setAuthToken(token);
+        const email = await AsyncStorage.getItem("email");
+        setUserEmail(email);
       } catch (error) {
         console.error("Error fetching auth token:", error);
       }
@@ -40,14 +44,30 @@ const CreateEventScreen = ({ navigation }) => {
     getAuthToken();
   }, []);
 
-  // Function to pick a document
+  // Function to convert file to base64
+  const fileToBase64 = async (fileUri) => {
+    try {
+      const base64 = await FileSystem.readAsStringAsync(fileUri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+      return base64;
+    } catch (error) {
+      console.error("Error converting file to base64:", error);
+      return null;
+    }
+  };
+
   const pickDocument = async () => {
     try {
       let result = await DocumentPicker.getDocumentAsync({
         type: ["image/jpeg", "image/png", "application/pdf"],
+        copyToCacheDirectory: true,
+        multiple: false,
       });
-      if (result.type !== "cancel") {
-        setFile(result);
+
+      if (result.assets && result.assets.length > 0) {
+        const doc = result.assets[0];
+        setFile(doc);
       }
     } catch (error) {
       console.error("Error picking document:", error);
@@ -55,17 +75,17 @@ const CreateEventScreen = ({ navigation }) => {
     }
   };
 
-  // Function to pick an image
   const pickImage = async () => {
     try {
-      let result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 1,
+      let result = await DocumentPicker.getDocumentAsync({
+        type: ["image/jpeg", "image/png"],
+        copyToCacheDirectory: true,
+        multiple: false,
       });
-      if (!result.canceled) {
-        setImage(result.uri);
+
+      if (result.assets && result.assets.length > 0) {
+        const img = result.assets[0];
+        setImage(img);
       }
     } catch (error) {
       console.error("Error picking image:", error);
@@ -85,26 +105,36 @@ const CreateEventScreen = ({ navigation }) => {
       return;
     }
 
-    const formData = new FormData();
-    formData.append("eventName", eventName);
-    formData.append("description", description);
-    formData.append("selectedDate", selectedDate);
-    formData.append("location", location);
+    // Create payload object instead of FormData
+    const payload = {
+      eventName,
+      description,
+      selectedDate,
+      location,
+    };
 
+    // Add file as base64 if it exists
     if (file) {
-      formData.append("file", {
-        uri: file.uri,
-        name: file.name,
-        type: file.mimeType || "application/octet-stream",
-      });
+      const fileBase64 = await fileToBase64(file.uri);
+      if (fileBase64) {
+        payload.file = {
+          data: fileBase64,
+          name: file.name,
+          type: file.mimeType || "application/octet-stream",
+        };
+      }
     }
 
+    // Add image as base64 if it exists
     if (image) {
-      formData.append("image", {
-        uri: image,
-        name: "event_image.jpg",
-        type: "image/jpeg",
-      });
+      const imageBase64 = await fileToBase64(image.uri);
+      if (imageBase64) {
+        payload.image = {
+          data: imageBase64,
+          name: image.name || "event_image.jpg",
+          type: image.mimeType || "image/jpeg",
+        };
+      }
     }
 
     try {
@@ -112,9 +142,9 @@ const CreateEventScreen = ({ navigation }) => {
         `${SERVER_ADDRESS}/data/event_requests/store`,
         {
           method: "POST",
-          body: formData,
+          body: JSON.stringify(payload),
           headers: {
-            "Content-Type": "multipart/form-data",
+            "Content-Type": "application/json",
             Authorization: `Bearer ${authToken}`,
           },
         },
@@ -122,8 +152,11 @@ const CreateEventScreen = ({ navigation }) => {
 
       const data = await response.json();
       if (response.ok) {
-        Alert.alert("Success", "Event created successfully!");
-        navigation.navigate("/(main_screen)/event-list");
+        Alert.alert(
+          "Success",
+          "Event Creation Request Added !, An approval email will be sent to your NSBM email !",
+        );
+        router.push("/(main_screen)/event-list");
       } else {
         Alert.alert("Error", `Failed to create event: ${data.message}`);
       }
@@ -146,12 +179,12 @@ const CreateEventScreen = ({ navigation }) => {
             onPress={pickImage}
             style={{ alignSelf: "flex-end", marginBottom: 10 }}
           >
-            <Ionicons name="camera" size={24} color="black" />
+            <Ionicons name="image" size={24} color="black" />
           </TouchableOpacity>
 
           {image && (
             <Image
-              source={{ uri: image }}
+              source={{ uri: image.uri }}
               style={{ width: 100, height: 100, marginBottom: 10 }}
             />
           )}

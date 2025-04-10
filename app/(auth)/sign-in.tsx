@@ -37,7 +37,6 @@ const SignInScreen = () => {
       if (!response.ok) {
         throw new Error(`Login failed: ${response.statusText}`);
       }
-
       const data = await response.json();
 
       console.log(data);
@@ -47,7 +46,7 @@ const SignInScreen = () => {
         throw new Error("Incomplete response from server.");
       }
 
-      console.log("Received data:", data);
+      // console.log("Received data:", data);
 
       // Prepare key-value pairs for AsyncStorage
       const userDetails = {

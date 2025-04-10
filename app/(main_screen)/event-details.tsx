@@ -1,15 +1,74 @@
-import React from "react";
-import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import TopNavigationComponent from "@/components/topNavigationComponent";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import SERVER_ADDRESS from "@/config";
+import { router } from "expo-router";
 
-const EventDetails: React.FC = () => {
+const EventDetails = () => {
   const params = useLocalSearchParams();
-  // const [loading, setLoading] = React.useState(true);
-  // console.log(params.image);
+  const [authToken, setAuthToken] = useState(null);
+  const [userEmail, setUserEmail] = useState(null);
 
-  const handleRegister = () => {
-    alert("Registered successfully!"); // Replace with actual registration logic
+  useEffect(() => {
+    const getAuthToken = async () => {
+      try {
+        const token = await AsyncStorage.getItem("apiKey");
+        const email = await AsyncStorage.getItem("email");
+        if (token) setAuthToken(token);
+        if (email) setUserEmail(email);
+      } catch (error) {
+        console.error("Error fetching auth token:", error);
+      }
+    };
+    getAuthToken();
+  }, []);
+
+  const handleRegister = async () => {
+    const payload = {
+      event_id: params.id,
+      event_name: params.title,
+      event_date: params.date,
+      event_time: params.time,
+      event_venue: params.venue,
+      user_email: userEmail, // use userEmail from state
+    };
+
+    try {
+      const response = await fetch(
+        `${SERVER_ADDRESS}/data/event_registrations/store`,
+        {
+          method: "POST",
+          body: JSON.stringify(payload),
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
+          },
+        },
+      );
+
+      const data = await response.json();
+      if (response.ok) {
+        Alert.alert(
+          "Success",
+          "Registration Completed! Further details will be sent to your email.",
+        );
+        router.push("/(main_screen)/event-list");
+      } else {
+        Alert.alert("Error", `Failed to register: ${data.message}`);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      Alert.alert("Error", "An error occurred while registering.");
+    }
   };
 
   return (
@@ -34,9 +93,7 @@ const EventDetails: React.FC = () => {
           style={styles.registerButton}
           onPress={handleRegister}
         >
-          <Text style={styles.registerButtonText}>
-            Register to this Event !
-          </Text>
+          <Text style={styles.registerButtonText}>Register to this Event!</Text>
         </TouchableOpacity>
       </View>
     </>

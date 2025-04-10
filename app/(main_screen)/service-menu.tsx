@@ -32,7 +32,7 @@ const menuItems = [
     title: "Food",
     icon: "utensils",
     color: "#2A6A6C", // Dark Green
-    navigateTo: "/(main_screen)/food",
+    navigateTo: "../../src/navigation/index.js",
   },
   {
     title: "University Map",

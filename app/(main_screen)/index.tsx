@@ -16,7 +16,6 @@ import { useSharedValue } from "react-native-reanimated";
 import { Stack } from "expo-router";
 import fetchData from "../services/fetcher";
 import Toast from "react-native-toast-message";
-// import caraouselComponent from "@/components/textnimageCaraousel";
 import { Ionicons } from "@expo/vector-icons";
 import authRefresh from "../services/authRefreshService";
 import { AppProvider } from "@/app/services/GlobalContext";
@@ -24,8 +23,7 @@ import { Alert } from "react-native";
 import EventsAndStallsScroller from "@/components/events_n_stalls_idex";
 import Loading from "@/components/loader";
 import FastImage from "react-native-fast-image";
-// import { TouchableOpacity } from "react-native-gesture-handler";
-// import { TouchableOpacityComponent } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context"; // Import SafeAreaView
 
 const width = Dimensions.get("window").width;
 
@@ -48,17 +46,13 @@ export default function HomeScreen() {
             console.log("Logged in");
             setIsLoggedIn(true);
             const storedName = await AsyncStorage.getItem("full_name");
-            setFullName(storedName || "User"); // Set full name state
-            // setLoadingState(false);
-            // console.log("Name:", storedName);
-
+            setFullName(storedName || "User");
             const result = await fetchData("news", key);
             setNewsData(result);
             const result_events = await fetchData("events", key);
             setEvents(result_events);
-            // console.log(newsData);
           } else {
-            Alert("Session Expired", "Please login again");
+            Alert.alert("Session Expired", "Please login again");
             router.replace("/(auth)/sign-in");
           }
         } else {
@@ -89,12 +83,12 @@ export default function HomeScreen() {
   }
 
   const handlePress = () => {
-    Vibration.vibrate(10); // Vibrate for 100ms
-    router.push("/event-list"); // Change to your desired route
+    Vibration.vibrate(10);
+    router.push("/event-list");
   };
 
   if (!isLoggedIn) {
-    return null; // Avoid rendering anything if not logged in
+    return null;
   }
 
   const images = [
@@ -106,9 +100,9 @@ export default function HomeScreen() {
   ];
 
   return (
-    <>
-      <AppProvider>
-        <Stack.Screen options={{ headerShown: false }} />
+    <AppProvider>
+      <Stack.Screen options={{ headerShown: false }} />
+      
         <View style={styles.header}>
           <View style={styles.ServicesMenu}>
             <Ionicons
@@ -227,16 +221,19 @@ export default function HomeScreen() {
             )}
           </View>
         </ScrollView>
-      </AppProvider>
-    </>
+      
+    </AppProvider>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#FFFFFF", // Match container background
+  },
   container: {
     flex: 1,
-    // position: "absolute",
-    backgroundColor: "#FFFFF",
+    backgroundColor: "#FFFFFF",
   },
   header: {
     flexDirection: "row",
@@ -258,7 +255,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "500",
     color: "#1B5E20",
-    justifyContent: "flex-end",
   },
   viewInfoButton: {
     position: "absolute",
@@ -268,8 +264,8 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     paddingHorizontal: 5,
     borderRadius: 5,
-    borderWidth: 1, // Optional: add a border for visibility
-    borderColor: "#1B5E20", // Optional: color of the border
+    borderWidth: 1,
+    borderColor: "#1B5E20",
   },
   profileIcon: {
     alignItems: "center",
@@ -281,18 +277,17 @@ const styles = StyleSheet.create({
   },
   ServicesMenu: {
     alignItems: "center",
-    justifyContent: "center", // This will vertically center the content
+    justifyContent: "center",
     width: 40,
     height: 40,
     borderRadius: 5,
     backgroundColor: "#C8E6C9",
   },
   tintOverlay: {
-    ...StyleSheet.absoluteFillObject, // fills the image's dimensions
-    backgroundColor: "rgba(144, 238, 144, 0.3)", // light green with 30% opacity
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(144, 238, 144, 0.3)",
     borderRadius: 10,
   },
-
   carouselItem: {
     flex: 1,
     justifyContent: "center",
@@ -308,45 +303,6 @@ const styles = StyleSheet.create({
     height: "95%",
     borderRadius: 12,
   },
-  imageWrapper: {
-    position: "relative",
-    width: "90%",
-    height: "95%",
-    borderRadius: 12,
-    overflow: "hidden", // ensures the tint respects the border radius
-  },
-  tintOverlay: {
-    padding: 16,
-    ...StyleSheet.absoluteFillObject, // covers the entire image
-    backgroundColor: "rgba(144, 238, 144, 0.3)", // light green with 30% opacity
-  },
-  subtitle: {
-    paddingTop: "2%",
-    textAlign: "center",
-    fontSize: 16,
-    fontStyle: "italic",
-    fontWeight: "300",
-    color: "#388E3C",
-    marginBottom: 16,
-  },
-  card: {
-    backgroundColor: "#d6e1ed",
-    height: "10%",
-    width: "90%",
-    alignSelf: "center",
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 8,
-    marginHorizontal: 16,
-    marginBottom: 16,
-  },
-  cardText: {
-    fontSize: 16,
-    alignItems: "center",
-    justifyContent: "center",
-    fontWeight: "200",
-    color: "#0D47A1",
-  },
   sectionTitle: {
     fontSize: 18,
     fontWeight: "bold",
@@ -359,23 +315,11 @@ const styles = StyleSheet.create({
     borderColor: "#DCEDC8",
     alignItems: "center",
   },
-  newsCard: {
-    backgroundColor: "#DCEDC8",
-    width: "48%",
-    height: "100%",
-    borderRadius: 8,
-    justifyContent: "center",
-    alignItems: "center",
-  },
   newsTitle: {
     fontSize: 14,
     padding: "2%",
     alignSelf: "center",
     fontWeight: "200",
     color: "#1B5E20",
-  },
-  newsDate: {
-    fontSize: 14,
-    color: "#558B2F",
   },
 });

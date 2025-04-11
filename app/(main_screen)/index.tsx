@@ -9,6 +9,7 @@ import {
   Image,
   Vibration,
   TouchableOpacity,
+  Linking,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Carousel, { Pagination } from "react-native-reanimated-carousel";
@@ -23,7 +24,7 @@ import { Alert } from "react-native";
 import EventsAndStallsScroller from "@/components/events_n_stalls_idex";
 import Loading from "@/components/loader";
 import FastImage from "react-native-fast-image";
-import { SafeAreaView } from "react-native-safe-area-context"; // Import SafeAreaView
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const width = Dimensions.get("window").width;
 
@@ -87,6 +88,31 @@ export default function HomeScreen() {
     router.push("/event-list");
   };
 
+  const handleNewsPress = async () => {
+    Vibration.vibrate(10);
+    try {
+      const url = "https://www.nsbm.ac.lk/category/news/";
+      const supported = await Linking.canOpenURL(url);
+      if (supported) {
+        await Linking.openURL(url);
+      } else {
+        Toast.show({
+          type: "error",
+          position: "bottom",
+          text1: "Cannot Open URL",
+          text2: "Unable to open the news page.",
+        });
+      }
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        position: "bottom",
+        text1: "Error",
+        text2: "Failed to open the news page.",
+      });
+    }
+  };
+
   if (!isLoggedIn) {
     return null;
   }
@@ -102,7 +128,7 @@ export default function HomeScreen() {
   return (
     <AppProvider>
       <Stack.Screen options={{ headerShown: false }} />
-      
+    
         <View style={styles.header}>
           <View style={styles.ServicesMenu}>
             <Ionicons
@@ -172,7 +198,11 @@ export default function HomeScreen() {
           />
 
           <Text style={styles.sectionTitle}>Events & Stalls</Text>
-          <ScrollView horizontal>
+          <ScrollView
+            horizontal
+            contentContainerStyle={styles.eventsScrollContainer}
+            showsHorizontalScrollIndicator={false}
+          >
             {events.map((event, index) => (
               <EventsAndStallsScroller
                 key={index}
@@ -182,12 +212,14 @@ export default function HomeScreen() {
                 image={event.event_image}
               />
             ))}
+            <TouchableOpacity
+              onPress={handlePress}
+              style={styles.arrowContainer}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="arrow-forward" size={24} color="#1B5E20" />
+            </TouchableOpacity>
           </ScrollView>
-          <TouchableOpacity onPress={handlePress}>
-            <View style={styles.viewInfoButton}>
-              <Text>See More</Text>
-            </View>
-          </TouchableOpacity>
 
           <Text style={styles.sectionTitle}>Latest News</Text>
           <View>
@@ -202,19 +234,20 @@ export default function HomeScreen() {
                   parallaxScrollingScale: 1,
                   parallaxScrollingOffset: 100,
                 }}
-                renderItem={({ item }) => {
-                  const base64Image = "data:image/jpeg;base64," + item.image;
-                  return (
-                    <View style={styles.newsContainer}>
-                      <View style={styles.tintOverlay} />
-                      <Text style={styles.newsTitle}>{item.news_title}</Text>
-                      <Image
-                        source={{ uri: item.image }}
-                        style={styles.newsCarouselImage}
-                      />
-                    </View>
-                  );
-                }}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    onPress={handleNewsPress}
+                    style={styles.newsContainer}
+                    activeOpacity={0.8}
+                  >
+                    <View style={styles.tintOverlay} />
+                    <Text style={styles.newsTitle}>{item.news_title}</Text>
+                    <Image
+                      source={{ uri: item.image }}
+                      style={styles.newsCarouselImage}
+                    />
+                  </TouchableOpacity>
+                )}
               />
             ) : (
               <Text style={{ alignSelf: "center" }}>No news available</Text>
@@ -229,7 +262,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#FFFFFF", // Match container background
+    backgroundColor: "#FFFFFF",
   },
   container: {
     flex: 1,
@@ -255,17 +288,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "500",
     color: "#1B5E20",
-  },
-  viewInfoButton: {
-    position: "absolute",
-    bottom: 10,
-    right: 15,
-    backgroundColor: "transparent",
-    paddingVertical: 5,
-    paddingHorizontal: 5,
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: "#1B5E20",
   },
   profileIcon: {
     alignItems: "center",
@@ -300,7 +322,7 @@ const styles = StyleSheet.create({
   },
   newsCarouselImage: {
     width: "95%",
-    height: "95%",
+    height: "86%",
     borderRadius: 12,
   },
   sectionTitle: {
@@ -321,5 +343,20 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     fontWeight: "200",
     color: "#1B5E20",
+  },
+  eventsScrollContainer: {
+    paddingHorizontal: 16,
+    paddingRight: 24, // Ensure arrow is fully visible
+    alignItems: "center", // Center items vertically
+  },
+  arrowContainer: {
+    width: 50,
+    height: 50,
+    backgroundColor: "#C8E6C9",
+    borderRadius: 25, // Circular shape
+    alignItems: "center",
+    justifyContent: "center",
+    marginLeft: 8, // Space from last event
+    alignSelf: "center", // Center vertically
   },
 });

@@ -119,6 +119,8 @@ const EventList = () => {
           time: event.event_time,
           venue: event.event_venue,
           image: event.event_image,
+          status: event.event_status,
+          link: event.event_link,
         },
       });
     }, 1000);

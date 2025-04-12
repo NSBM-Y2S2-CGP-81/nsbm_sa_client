@@ -220,6 +220,7 @@ export default function HomeScreen() {
               heading={event.event_name}
               subtitle={event.event_venue}
               venues={event.event_date}
+              status={event.event_status}
               image={event.event_image}
             />
           ))}

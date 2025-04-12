@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
+  Linking,
 } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import TopNavigationComponent from "@/components/topNavigationComponent";
@@ -67,69 +68,93 @@ const EventDetails = () => {
   };
 
   const handleRegister = async () => {
-    try {
-      const regCount = await getEventsRegCount();
-      console.log(params.id);
-      const userRegCountResponse = await fetch(
-        `${SERVER_ADDRESS}/data/event_registrations/count?field=user_email&value=${userEmail}&event_data_get=${params.id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
-        },
-      );
-
-      if (!userRegCountResponse.ok) {
-        throw new Error("Failed to check user registration count");
-      }
-
-      const userRegCountData = await userRegCountResponse.json();
-      const userRegCount = userRegCountData.count;
-
-      if (params.event_tickets <= regCount) {
-        Alert.alert("Error", "Event tickets are sold out.");
+    // If link exists, open it instead of registering
+    if (params.link && params.link !== "") {
+      try {
+        await Linking.openURL(params.link as string);
         return;
+      } catch (error) {
+        console.error("Error opening URL:", error);
+        Alert.alert("Error", "Could not open the link.");
       }
-
-      if (userRegCount > 0) {
-        Alert.alert("Error", "You are already registered for this event.");
-        return;
-      }
-
-      const payload = {
-        event_id: params.id,
-        event_name: params.title,
-        event_date: params.date,
-        event_time: params.time,
-        event_venue: params.venue,
-        user_email: userEmail,
-      };
-
-      const response = await fetch(
-        `${SERVER_ADDRESS}/data/event_registrations/store`,
-        {
-          method: "POST",
-          body: JSON.stringify(payload),
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${authToken}`,
+    } else {
+      try {
+        const regCount = await getEventsRegCount();
+        console.log(params.id);
+        const userRegCountResponse = await fetch(
+          `${SERVER_ADDRESS}/data/event_registrations/count?field=user_email&value=${userEmail}&event_data_get=${params.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
           },
-        },
-      );
-
-      const data = await response.json();
-      if (response.ok) {
-        Alert.alert(
-          "Success",
-          "Registration Completed! Further details will be sent to your email.",
         );
-        router.push("/(main_screen)/event-list");
-      } else {
-        Alert.alert("Error", `Failed to register: ${data.message}`);
+
+        if (!userRegCountResponse.ok) {
+          throw new Error("Failed to check user registration count");
+        }
+
+        const userRegCountData = await userRegCountResponse.json();
+        const userRegCount = userRegCountData.count;
+
+        if (params.event_tickets <= regCount) {
+          Alert.alert("Error", "Event tickets are sold out.");
+          return;
+        }
+
+        if (userRegCount > 0) {
+          Alert.alert("Error", "You are already registered for this event.");
+          return;
+        }
+
+        const payload = {
+          event_id: params.id,
+          event_name: params.title,
+          event_date: params.date,
+          event_time: params.time,
+          event_venue: params.venue,
+          event_status: params.status,
+          user_email: userEmail,
+          link: params.link,
+        };
+
+        const response = await fetch(
+          `${SERVER_ADDRESS}/data/event_registrations/store`,
+          {
+            method: "POST",
+            body: JSON.stringify(payload),
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${authToken}`,
+            },
+          },
+        );
+
+        const data = await response.json();
+        if (response.ok) {
+          Alert.alert(
+            "Success",
+            "Registration Completed! Further details will be sent to your email.",
+          );
+          router.push("/(main_screen)/event-list");
+        } else {
+          Alert.alert("Error", `Failed to register: ${data.message}`);
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        Alert.alert("Error", "An error occurred while registering.");
       }
-    } catch (error) {
-      console.error("Error:", error);
-      Alert.alert("Error", "An error occurred while registering.");
+    }
+  };
+
+  const handleButtonPress = async () => {
+    if (params.link && params.link !== "") {
+      try {
+        await Linking.openURL(params.link as string);
+      } catch (error) {
+        console.error("Error opening URL:", error);
+        Alert.alert("Error", "Could not open the link.");
+      }
     }
   };
 
@@ -147,22 +172,85 @@ const EventDetails = () => {
             style={styles.eventImage}
           />
           <Text style={styles.eventTitle}>{params.title || "Event Title"}</Text>
-          <Text style={styles.eventInfo}>Date: {params.date || "N/A"}</Text>
-          <Text style={styles.eventInfo}>Time: {params.time || "N/A"}</Text>
+          <Text style={styles.eventInfo}>
+            Date:{" "}
+            {params.status === "Rescheduled" || params.status === "Canceled"
+              ? "N/A"
+              : params.date || "N/A"}
+          </Text>
+          <Text style={styles.eventInfo}>
+            Time:{" "}
+            {params.status === "Rescheduled" || params.status === "Cancelled"
+              ? "N/A"
+              : params.time || "N/A"}
+          </Text>
           <Text style={styles.eventInfo}>Venue: {params.venue || "N/A"}</Text>
+          <Text style={styles.eventInfo}>Status: {params.status || "N/A"}</Text>
+
           <Text style={styles.eventInfo}>
             Tickets Available:{" "}
-            {isNaN(parseInt(params.tickets))
-              ? "N/A"
-              : parseInt(params.tickets) - registerCount}
+            {params.link && params.link !== ""
+              ? "Registering through External Source"
+              : isNaN(parseInt(params.tickets as string))
+                ? "N/A"
+                : parseInt(params.tickets as string) - registerCount}
           </Text>
         </View>
-        <TouchableOpacity
-          style={styles.registerButton}
-          onPress={handleRegister}
-        >
-          <Text style={styles.registerButtonText}>Register to this Event!</Text>
-        </TouchableOpacity>
+        {params.status === "Rescheduled" && (
+          <TouchableOpacity
+            style={[styles.registerButton, { backgroundColor: "#FFD700" }]}
+            onPress={
+              params.link && params.link !== "" ? handleButtonPress : undefined
+            }
+          >
+            <Text style={styles.registerButtonText}>Event Rescheduled</Text>
+          </TouchableOpacity>
+        )}
+        {params.status === "Cancelled" && (
+          <TouchableOpacity
+            style={[styles.registerButton, { backgroundColor: "#FF6347" }]}
+            onPress={
+              params.link && params.link !== "" ? handleButtonPress : undefined
+            }
+          >
+            <Text style={styles.registerButtonText}>Event Canceled</Text>
+          </TouchableOpacity>
+        )}
+        {params.status === "Completed" && (
+          <TouchableOpacity
+            style={[styles.registerButton, { backgroundColor: "#808080" }]}
+            onPress={
+              params.link && params.link !== "" ? handleButtonPress : undefined
+            }
+          >
+            <Text style={styles.registerButtonText}>Event Completed</Text>
+          </TouchableOpacity>
+        )}
+        {params.status === "Ongoing" && (
+          <TouchableOpacity
+            style={[styles.registerButton, { backgroundColor: "#4682B4" }]}
+            onPress={
+              params.link && params.link !== "" ? handleButtonPress : undefined
+            }
+          >
+            <Text style={styles.registerButtonText}>Event In Progress</Text>
+          </TouchableOpacity>
+        )}
+        {params.status !== "Rescheduled" &&
+          params.status !== "Cancelled" &&
+          params.status !== "Completed" &&
+          params.status !== "Ongoing" && (
+            <TouchableOpacity
+              style={styles.registerButton}
+              onPress={handleRegister}
+            >
+              <Text style={styles.registerButtonText}>
+                {params.link && params.link !== ""
+                  ? "Open Event Link"
+                  : "Register to this Event!"}
+              </Text>
+            </TouchableOpacity>
+          )}
       </View>
     </>
   );

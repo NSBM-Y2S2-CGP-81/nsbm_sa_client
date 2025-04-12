@@ -39,6 +39,11 @@ const CreateEventScreen = ({ navigation }) => {
   const [eventType, setEventType] = useState("");
   const [societyName, setSocietyName] = useState("");
   const [showEventTypeModal, setShowEventTypeModal] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedType, setSelectedType] = useState("");
+  const [selectedSociety, setSelectedSociety] = useState("");
+  // Registration form link state
+  const [registrationLink, setRegistrationLink] = useState("");
 
   // Event type options
   const eventTypes = [
@@ -180,6 +185,11 @@ const CreateEventScreen = ({ navigation }) => {
       eventType,
       societyName: eventType === "A Stall" ? "" : societyName,
     };
+
+    // Add registration link if event is not a stall
+    if (eventType !== "A Stall" && registrationLink) {
+      payload.registrationLink = registrationLink;
+    }
 
     if (file) {
       const fileBase64 = await fileToBase64(file.uri);
@@ -378,6 +388,26 @@ const CreateEventScreen = ({ navigation }) => {
                 placeholder={`Enter ${eventType === "Event Held by a Club" ? "club" : "society"} name`}
                 value={societyName}
                 onChangeText={setSocietyName}
+                style={{
+                  borderWidth: 1,
+                  padding: 10,
+                  borderRadius: 8,
+                  marginBottom: 15,
+                }}
+              />
+            </>
+          )}
+
+          {/* Registration Form Link (shown only if not a stall) */}
+          {eventType !== "A Stall" && eventType !== "" && (
+            <>
+              <Text style={{ fontWeight: "600" }}>
+                Registration Form Link (Optional)
+              </Text>
+              <TextInput
+                placeholder="Enter registration form URL"
+                value={registrationLink}
+                onChangeText={setRegistrationLink}
                 style={{
                   borderWidth: 1,
                   padding: 10,

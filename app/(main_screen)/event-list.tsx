@@ -16,6 +16,7 @@ import fetchData from "../services/fetcher";
 import TopNavigationComponent from "@/components/topNavigationComponent";
 import EventSearchAndGallery from "@/components/eventsAndGallery";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import SERVER_ADDRESS from "@/config";
 
 const EventList = () => {
   const [events, setEvents] = useState([]);
@@ -86,6 +87,22 @@ const EventList = () => {
     }, 800); // Small delay to show loading state
   };
 
+  const getEventsRegCount = async (event: any) => {
+    try {
+      const response = await fetch(
+        `${SERVER_ADDRESS}/data/event_registrations/count?field=event_id&value=${event.event_id}`,
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch registration count");
+      }
+      const data = await response.json();
+      return data.count;
+    } catch (error) {
+      console.error("Error fetching registration count:", error);
+      return 0;
+    }
+  };
+
   const goToEventDetails = (event: any) => {
     setModalVisible(false);
     setEventLoading(true); // Show loading throbber
@@ -95,6 +112,8 @@ const EventList = () => {
       router.push({
         pathname: "/(main_screen)/event-details",
         params: {
+          id: event._id,
+          tickets: event.event_tickets,
           title: event.event_name,
           date: event.event_date,
           time: event.event_time,
@@ -102,8 +121,7 @@ const EventList = () => {
           image: event.event_image,
         },
       });
-      // Loading state will be hidden when the new screen loads
-    }, 300);
+    }, 1000);
   };
 
   const renderEventItem = ({ item }) => (

@@ -15,8 +15,9 @@ import { router } from "expo-router";
 
 const EventDetails = () => {
   const params = useLocalSearchParams();
-  const [authToken, setAuthToken] = useState(null);
-  const [userEmail, setUserEmail] = useState(null);
+  const [authToken, setAuthToken] = useState<string | null>(null);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [registerCount, setRegisterCount] = useState(0);
 
   useEffect(() => {
     const getAuthToken = async () => {
@@ -32,17 +33,78 @@ const EventDetails = () => {
     getAuthToken();
   }, []);
 
-  const handleRegister = async () => {
-    const payload = {
-      event_id: params.id,
-      event_name: params.title,
-      event_date: params.date,
-      event_time: params.time,
-      event_venue: params.venue,
-      user_email: userEmail, // use userEmail from state
+  useEffect(() => {
+    const fetchRegCount = async () => {
+      if (authToken && params?.id) {
+        const regCount = await getEventsRegCount();
+        console.log("Fetched reg count:", regCount);
+        setRegisterCount(regCount);
+      }
     };
 
+    fetchRegCount();
+  }, [authToken, params.id]);
+
+  const getEventsRegCount = async () => {
     try {
+      const response = await fetch(
+        `${SERVER_ADDRESS}/data/event_registrations/count?field=event_id&value=${params.id}&event_data_get=${params.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        },
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch registration count");
+      }
+      const data = await response.json();
+      return data.count;
+    } catch (error) {
+      console.error("Error fetching registration count:", error);
+      return 0;
+    }
+  };
+
+  const handleRegister = async () => {
+    try {
+      const regCount = await getEventsRegCount();
+      console.log(params.id);
+      const userRegCountResponse = await fetch(
+        `${SERVER_ADDRESS}/data/event_registrations/count?field=user_email&value=${userEmail}&event_data_get=${params.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        },
+      );
+
+      if (!userRegCountResponse.ok) {
+        throw new Error("Failed to check user registration count");
+      }
+
+      const userRegCountData = await userRegCountResponse.json();
+      const userRegCount = userRegCountData.count;
+
+      if (params.event_tickets <= regCount) {
+        Alert.alert("Error", "Event tickets are sold out.");
+        return;
+      }
+
+      if (userRegCount > 0) {
+        Alert.alert("Error", "You are already registered for this event.");
+        return;
+      }
+
+      const payload = {
+        event_id: params.id,
+        event_name: params.title,
+        event_date: params.date,
+        event_time: params.time,
+        event_venue: params.venue,
+        user_email: userEmail,
+      };
+
       const response = await fetch(
         `${SERVER_ADDRESS}/data/event_registrations/store`,
         {
@@ -88,6 +150,12 @@ const EventDetails = () => {
           <Text style={styles.eventInfo}>Date: {params.date || "N/A"}</Text>
           <Text style={styles.eventInfo}>Time: {params.time || "N/A"}</Text>
           <Text style={styles.eventInfo}>Venue: {params.venue || "N/A"}</Text>
+          <Text style={styles.eventInfo}>
+            Tickets Available:{" "}
+            {isNaN(parseInt(params.tickets))
+              ? "N/A"
+              : parseInt(params.tickets) - registerCount}
+          </Text>
         </View>
         <TouchableOpacity
           style={styles.registerButton}

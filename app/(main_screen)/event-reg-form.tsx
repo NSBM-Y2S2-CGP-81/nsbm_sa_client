@@ -7,6 +7,8 @@ import {
   ScrollView,
   Alert,
   Image,
+  ActivityIndicator,
+  Platform,
 } from "react-native";
 import { Calendar } from "react-native-calendars";
 import * as DocumentPicker from "expo-document-picker";
@@ -16,17 +18,22 @@ import TopNavigationComponent from "@/components/topNavigationComponent";
 import SERVER_ADDRESS from "@/config";
 import * as FileSystem from "expo-file-system";
 import { router } from "expo-router";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 const CreateEventScreen = ({ navigation }) => {
   const [eventName, setEventName] = useState("");
   const [description, setDescription] = useState("");
   const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedTime, setSelectedTime] = useState(new Date());
   const [showCalendar, setShowCalendar] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
   const [location, setLocation] = useState("");
   const [file, setFile] = useState(null);
   const [image, setImage] = useState(null);
   const [authToken, setAuthToken] = useState(null);
   const [userEmail, setUserEmail] = useState(null);
+  const [maxTickets, setMaxTickets] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   // Fetch the auth token from AsyncStorage
   useEffect(() => {
@@ -93,9 +100,35 @@ const CreateEventScreen = ({ navigation }) => {
     }
   };
 
+  // Function to handle max tickets input, allowing only numbers
+  const handleMaxTicketsChange = (text) => {
+    // Only allow numeric input
+    if (/^\d*$/.test(text)) {
+      setMaxTickets(text);
+    }
+  };
+
+  // Time picker handlers
+  const onTimeChange = (event, selectedTime) => {
+    const currentTime = selectedTime || new Date();
+    setShowTimePicker(Platform.OS === "ios");
+    setSelectedTime(currentTime);
+  };
+
+  // Format time for display
+  const formatTime = (time) => {
+    return time.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  };
+
   // Function to submit event
   const submitEvent = async () => {
-    if (!eventName || !description || !selectedDate || !location) {
+    if (
+      !eventName ||
+      !description ||
+      !selectedDate ||
+      !location ||
+      !maxTickets
+    ) {
       Alert.alert("Error", "Please fill in all required fields.");
       return;
     }
@@ -105,15 +138,24 @@ const CreateEventScreen = ({ navigation }) => {
       return;
     }
 
-    // Create payload object instead of FormData
+    setIsLoading(true);
+
+    // Format the selected time (HH:MM:SS)
+    const hours = selectedTime.getHours().toString().padStart(2, "0");
+    const minutes = selectedTime.getMinutes().toString().padStart(2, "0");
+    const seconds = selectedTime.getSeconds().toString().padStart(2, "0");
+    const formattedTime = `${hours}:${minutes}:${seconds}`;
+
+    // Create payload with separate date and time
     const payload = {
       eventName,
       description,
-      selectedDate,
+      selectedDate, // YYYY-MM-DD
+      selectedTime: formattedTime, // HH:MM:SS
       location,
+      maxTickets: parseInt(maxTickets, 10),
     };
 
-    // Add file as base64 if it exists
     if (file) {
       const fileBase64 = await fileToBase64(file.uri);
       if (fileBase64) {
@@ -125,7 +167,6 @@ const CreateEventScreen = ({ navigation }) => {
       }
     }
 
-    // Add image as base64 if it exists
     if (image) {
       const imageBase64 = await fileToBase64(image.uri);
       if (imageBase64) {
@@ -151,6 +192,8 @@ const CreateEventScreen = ({ navigation }) => {
       );
 
       const data = await response.json();
+      setIsLoading(false);
+
       if (response.ok) {
         Alert.alert(
           "Success",
@@ -162,6 +205,7 @@ const CreateEventScreen = ({ navigation }) => {
       }
     } catch (error) {
       console.error("Error:", error);
+      setIsLoading(false);
       Alert.alert("Error", "An error occurred while creating the event.");
     }
   };
@@ -243,6 +287,34 @@ const CreateEventScreen = ({ navigation }) => {
             />
           )}
 
+          <Text style={{ fontWeight: "600" }}>Select Time</Text>
+          <TouchableOpacity
+            onPress={() => setShowTimePicker(true)}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              padding: 10,
+              borderWidth: 1,
+              borderRadius: 8,
+              marginBottom: 10,
+            }}
+          >
+            <Text style={{ flex: 1 }}>
+              {selectedTime ? formatTime(selectedTime) : "Pick a time"}
+            </Text>
+            <Ionicons name="time-outline" size={20} color="black" />
+          </TouchableOpacity>
+
+          {showTimePicker && (
+            <DateTimePicker
+              value={selectedTime}
+              mode="time"
+              is24Hour={false}
+              display="default"
+              onChange={onTimeChange}
+            />
+          )}
+
           <Text style={{ fontWeight: "600" }}>Location</Text>
           <TextInput
             placeholder="Enter event location"
@@ -253,6 +325,22 @@ const CreateEventScreen = ({ navigation }) => {
               padding: 10,
               borderRadius: 8,
               marginBottom: 10,
+            }}
+          />
+
+          <Text style={{ fontWeight: "600", marginTop: 10 }}>
+            Maximum Tickets Available
+          </Text>
+          <TextInput
+            placeholder="Enter maximum number of tickets"
+            value={maxTickets}
+            onChangeText={handleMaxTicketsChange}
+            keyboardType="numeric"
+            style={{
+              borderWidth: 1,
+              padding: 10,
+              borderRadius: 8,
+              marginBottom: 15,
             }}
           />
 
@@ -280,16 +368,36 @@ const CreateEventScreen = ({ navigation }) => {
 
           <TouchableOpacity
             onPress={submitEvent}
+            disabled={isLoading}
             style={{
               backgroundColor: "#34A853",
               padding: 15,
               borderRadius: 10,
               alignItems: "center",
+              flexDirection: "row",
+              justifyContent: "center",
             }}
           >
-            <Text style={{ color: "white", fontSize: 16, fontWeight: "bold" }}>
-              Create Event
-            </Text>
+            {isLoading ? (
+              <>
+                <ActivityIndicator
+                  size="small"
+                  color="white"
+                  style={{ marginRight: 10 }}
+                />
+                <Text
+                  style={{ color: "white", fontSize: 16, fontWeight: "bold" }}
+                >
+                  Creating Event...
+                </Text>
+              </>
+            ) : (
+              <Text
+                style={{ color: "white", fontSize: 16, fontWeight: "bold" }}
+              >
+                Create Event
+              </Text>
+            )}
           </TouchableOpacity>
         </View>
       </ScrollView>

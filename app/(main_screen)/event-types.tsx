@@ -13,12 +13,14 @@ import TopNavigationComponent from "@/components/topNavigationComponent";
 import fetchData from "../services/fetcher";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Loading from "@/components/loader";
+import Icon from "react-native-vector-icons/MaterialIcons"; // Import icon library
 
 const { width } = Dimensions.get("window");
 
 const UpcomingEventsScreen = () => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [sortByDate, setSortByDate] = useState(true); // State for sorting
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -30,7 +32,17 @@ const UpcomingEventsScreen = () => {
         }
         setLoading(true);
         const result = await fetchData("events", key);
-        if (result) setEvents(result);
+        if (result) {
+          // Sort events by date if sortByDate is true
+          const sortedEvents = sortByDate
+            ? [...result].sort(
+                (a, b) =>
+                  new Date(a.event_date).getTime() -
+                  new Date(b.event_date).getTime(),
+              )
+            : result;
+          setEvents(sortedEvents);
+        }
       } catch (error) {
         console.error("Error fetching events:", error);
       } finally {
@@ -39,7 +51,11 @@ const UpcomingEventsScreen = () => {
     };
 
     fetchEvents();
-  }, []);
+  }, [sortByDate]); // Re-fetch or re-sort when sortByDate changes
+
+  const toggleSort = () => {
+    setSortByDate(!sortByDate);
+  };
 
   return (
     <>
@@ -52,6 +68,14 @@ const UpcomingEventsScreen = () => {
         <Loading />
       ) : (
         <View style={styles.container}>
+          {/* Filter Icon Button */}
+          <TouchableOpacity style={styles.filterButton} onPress={toggleSort}>
+            <Icon
+              name={sortByDate ? "filter-list-off" : "filter-list"}
+              size={24}
+              color="#39b54a"
+            />
+          </TouchableOpacity>
           <FlatList
             data={events}
             numColumns={1}
@@ -67,6 +91,7 @@ const UpcomingEventsScreen = () => {
                 <Text style={styles.eventDate}>{item.event_date}</Text>
               </View>
             )}
+            keyExtractor={(item) => item.id?.toString() || Math.random().toString()}
           />
           <TouchableOpacity
             style={styles.createEventButton}
@@ -127,6 +152,12 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  filterButton: {
+    position: "relative",
+    padding: 10,
+    paddingBottom: .9,
+    zIndex: 1,
   },
 });
 

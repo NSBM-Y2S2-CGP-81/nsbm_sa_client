@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react"; // Added useEffect
 import {
   View,
   Text,
@@ -10,9 +10,9 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import TopNavigationComponent from "@/components/topNavigationComponent";
 import { ScrollView } from "react-native";
+import { router } from "expo-router"; // Import router from expo-router
 
 const UserProfile = () => {
-  // Initialize states without default values, allowing user input
   const [studentId, setStudentId] = useState("");
   const [intake, setIntake] = useState("");
   const [name, setName] = useState("");
@@ -24,7 +24,6 @@ const UserProfile = () => {
   const [mobile, setMobile] = useState("");
 
   // Retrieve user data from AsyncStorage
-  //
   const getUserData = async () => {
     try {
       const studentId = await AsyncStorage.getItem("student_id");
@@ -36,33 +35,45 @@ const UserProfile = () => {
       const nic = await AsyncStorage.getItem("nic");
       const email = await AsyncStorage.getItem("email");
       const mobile = await AsyncStorage.getItem("phone_number");
-      setStudentId(studentId);
-      setIntake(intake);
-      setName(name);
-      setNsbmEmail(nsbmEmail);
-      setDegree(degree);
-      setOfferedBy(offeredBy);
-      setNic(nic);
-      setEmail(email);
-      setMobile(mobile);
+      setStudentId(studentId || "");
+      setIntake(intake || "");
+      setName(name || "");
+      setNsbmEmail(nsbmEmail || "");
+      setDegree(degree || "");
+      setOfferedBy(offeredBy || "");
+      setNic(nic || "");
+      setEmail(email || "");
+      setMobile(mobile || "");
     } catch (error) {
       console.error("Error fetching user data:", error);
     }
   };
-  getUserData(); // Call the function to retrieve user data
+
+  // Fetch data on component mount
+  useEffect(() => {
+    getUserData();
+  }, []); // Empty dependency array to run once on mount
 
   const handleLogout = async () => {
     try {
       await AsyncStorage.clear(); // Clear all AsyncStorage data
-      Alert.alert("Logged Out", "You have been logged out successfully.");
-      // Optionally, navigate to login screen or reset state
+      Alert.alert("Logged Out", "You have been logged out successfully.", [
+        {
+          text: "OK",
+          onPress: () => {
+            router.replace("/(auth)/sign-in"); // Navigate to login screen
+          },
+        },
+      ]);
     } catch (error) {
       console.error("Error clearing AsyncStorage:", error);
+      Alert.alert("Error", "Failed to log out. Please try again.");
     }
   };
 
   return (
     <>
+    
       <TopNavigationComponent
         title={"User Profile"}
         subtitle={""}
@@ -98,13 +109,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f5f5f5",
-    paddingTop: 15, // Adjust padding to align with the top navigation height
+    paddingTop: 15,
   },
   profileContainer: {
     backgroundColor: "white",
     margin: 20,
     padding: 20,
-    borderRadius: 12, // Adjust for a softer rounded corner, matching common design styles
+    borderRadius: 12,
     alignItems: "center",
     shadowColor: "#000",
     shadowOpacity: 0.15,
@@ -125,11 +136,11 @@ const styles = StyleSheet.create({
     padding: 12,
     borderWidth: 1,
     borderColor: "#ddd",
-    borderRadius: 8, // Rounded corners for text boxes
-    marginBottom: 12, // Increased margin for better spacing
-    fontSize: 16, // Adjust font size for readability
-    backgroundColor: "#fafafa", // Light background color for text boxes
-    color: "#333", // Text color
+    borderRadius: 8,
+    marginBottom: 12,
+    fontSize: 16,
+    backgroundColor: "#fafafa",
+    color: "#333",
   },
   logoutButton: {
     marginTop: 20,
@@ -137,13 +148,13 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 25,
     borderRadius: 8,
-    elevation: 2, // Added elevation for subtle shadow
+    elevation: 2,
   },
   logoutText: {
     color: "white",
     fontWeight: "bold",
-    textAlign: "center", // Ensure text is centered
-    fontSize: 16, // Increased font size for better readability
+    textAlign: "center",
+    fontSize: 16,
   },
 });
 

@@ -6,16 +6,16 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import CustomText from "@/components/CustomText";
-// import { useRouter } from "expo-router";
-import Toast from "react-native-toast-message"; // Add Toast library
+import Toast from "react-native-toast-message";
 import SERVER_ADDRESS from "@/config";
 import { Link, router } from "expo-router";
 import { Stack } from "expo-router";
 
 const SignInScreen = () => {
-  // const router = useRouter();
   const [mail, setMail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -39,16 +39,10 @@ const SignInScreen = () => {
       }
       const data = await response.json();
 
-      console.log(data);
-
-      // Validate that all required fields exist
       if (!data.access_token || !data.email || !data.full_name) {
         throw new Error("Incomplete response from server.");
       }
 
-      // console.log("Received data:", data);
-
-      // Prepare key-value pairs for AsyncStorage
       const userDetails = {
         apiKey: data.access_token,
         full_name: data.full_name,
@@ -61,13 +55,10 @@ const SignInScreen = () => {
         university: data.university || "",
         nic: data.nic || "",
         created_at: data.created_at || "",
-        password: password, // Store password only if necessary (security risk)
+        password: password,
       };
 
-      // Remove old API key before storing new data
       await AsyncStorage.removeItem("apiKey");
-
-      // Store all data in AsyncStorage
       await Promise.all(
         Object.entries(userDetails).map(([key, value]) =>
           AsyncStorage.setItem(key, value),
@@ -84,17 +75,14 @@ const SignInScreen = () => {
       router.replace("/");
     } catch (error: unknown) {
       console.error("Login error:", error);
-    
-      // Type guard to check if the error is an instance of Error
       if (error instanceof Error) {
         Toast.show({
           type: "error",
           position: "top",
           text1: "Login Failed",
-          text2: error.message || "An error occurred. Please try again.", // Now 'message' can safely be accessed
+          text2: error.message || "An error occurred. Please try again.",
         });
       } else {
-        // In case the error is not an instance of Error, handle it gracefully
         Toast.show({
           type: "error",
           position: "top",
@@ -103,62 +91,65 @@ const SignInScreen = () => {
         });
       }
     }
-  
-
   };
 
   return (
-    <View style={styles.container}>
-      <Image
-        source={require("../../assets/images/nsbm_logo.png")}
-        style={styles.logo}
-      />
-      <CustomText style={styles.title}>Sign In</CustomText>
-      <Stack.Screen options={{ headerShown: false }} />
-      <View style={styles.form}>
-        <CustomText style={styles.label}>NSBM Email</CustomText>
-        <TextInput
-          style={styles.input}
-          placeholder="someone@students.nsbm.ac.lk"
-          value={mail}
-          onChangeText={setMail}
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+    >
+      <View style={styles.container}>
+        <Image
+          source={require("../../assets/images/nsbm_logo.png")}
+          style={styles.logo}
         />
+        <CustomText style={styles.title}>Sign In</CustomText>
+        <Stack.Screen options={{ headerShown: false }} />
+        <View style={styles.form}>
+          <CustomText style={styles.label}>NSBM Email</CustomText>
+          <TextInput
+            style={styles.input}
+            placeholder="someone@students.nsbm.ac.lk"
+            value={mail}
+            onChangeText={setMail}
+          />
 
-        <CustomText style={styles.label}>Password</CustomText>
-        <TextInput
-          style={styles.input}
-          placeholder="********"
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-        />
+          <CustomText style={styles.label}>Password</CustomText>
+          <TextInput
+            style={styles.input}
+            placeholder="********"
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
+          />
 
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={[styles.button, styles.signInButton]}
-            onPress={handleSignIn} // Trigger the login process
-          >
-            <CustomText style={styles.buttonText}>Sign In</CustomText>
-          </TouchableOpacity>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={[styles.button, styles.signInButton]}
+              onPress={handleSignIn}
+            >
+              <CustomText style={styles.buttonText}>Sign In</CustomText>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[styles.button, styles.googleButton]}
-            onPress={() => router.replace("/(auth)/sign-up")}
-          >
-            <CustomText style={styles.googlebuttonText}>Sign Up</CustomText>
+            <TouchableOpacity
+              style={[styles.button, styles.googleButton]}
+              onPress={() => router.replace("/(auth)/sign-up")}
+            >
+              <CustomText style={styles.googlebuttonText}>Sign Up</CustomText>
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity>
+            <CustomText style={styles.forgotPassword}>
+              Forgot Password?
+            </CustomText>
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity>
-          <CustomText style={styles.forgotPassword}>
-            Forgot Password?
-          </CustomText>
-        </TouchableOpacity>
+        <Toast />
       </View>
-
-      {/* Add Toast container */}
-      <Toast />
-    </View>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -198,7 +189,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   input: {
-    backgroundColor: "#ffffff",
+    backgroundColor: "#F5F5F5", // Changed to light grey
     padding: 10,
     fontSize: 20,
     fontStyle: "italic",
@@ -226,13 +217,13 @@ const styles = StyleSheet.create({
     marginLeft: 5,
   },
   buttonText: {
-    color: "#fff",
-    fontWeight: "100",
+    color: "white",
+    fontWeight: "300",
     fontSize: 16,
   },
   googlebuttonText: {
-    color: "#fff",
-    fontWeight: "100",
+    color: "black",
+    fontWeight: "200",
     fontSize: 16,
   },
   forgotPassword: {

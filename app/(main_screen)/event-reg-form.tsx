@@ -9,6 +9,7 @@ import {
   Image,
   ActivityIndicator,
   Platform,
+  Modal,
 } from "react-native";
 import { Calendar } from "react-native-calendars";
 import * as DocumentPicker from "expo-document-picker";
@@ -34,6 +35,17 @@ const CreateEventScreen = ({ navigation }) => {
   const [userEmail, setUserEmail] = useState(null);
   const [maxTickets, setMaxTickets] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  // New states for event type dropdown and society name
+  const [eventType, setEventType] = useState("");
+  const [societyName, setSocietyName] = useState("");
+  const [showEventTypeModal, setShowEventTypeModal] = useState(false);
+
+  // Event type options
+  const eventTypes = [
+    "Event Held by a Club",
+    "Event Held by a Society",
+    "A Stall",
+  ];
 
   // Fetch the auth token from AsyncStorage
   useEffect(() => {
@@ -127,9 +139,20 @@ const CreateEventScreen = ({ navigation }) => {
       !description ||
       !selectedDate ||
       !location ||
-      !maxTickets
+      !maxTickets ||
+      !eventType
     ) {
       Alert.alert("Error", "Please fill in all required fields.");
+      return;
+    }
+
+    // Check if society name is required but not filled
+    if (
+      (eventType === "Event Held by a Club" ||
+        eventType === "Event Held by a Society") &&
+      !societyName
+    ) {
+      Alert.alert("Error", "Please enter the society or club name.");
       return;
     }
 
@@ -154,6 +177,8 @@ const CreateEventScreen = ({ navigation }) => {
       selectedTime: formattedTime, // HH:MM:SS
       location,
       maxTickets: parseInt(maxTickets, 10),
+      eventType,
+      societyName: eventType === "A Stall" ? "" : societyName,
     };
 
     if (file) {
@@ -256,6 +281,112 @@ const CreateEventScreen = ({ navigation }) => {
               paddingVertical: 10,
             }}
           />
+
+          {/* Event Type Dropdown */}
+          <Text style={{ fontWeight: "600" }}>This Event is a...</Text>
+          <TouchableOpacity
+            onPress={() => setShowEventTypeModal(true)}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              padding: 10,
+              borderWidth: 1,
+              borderRadius: 8,
+              marginBottom: 15,
+            }}
+          >
+            <Text style={{ flex: 1 }}>
+              {eventType ? eventType : "Select Type"}
+            </Text>
+            <Ionicons name="chevron-down" size={20} color="black" />
+          </TouchableOpacity>
+
+          {/* Event Type Modal */}
+          <Modal
+            visible={showEventTypeModal}
+            transparent={true}
+            animationType="slide"
+          >
+            <View
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+                backgroundColor: "rgba(0,0,0,0.5)",
+              }}
+            >
+              <View
+                style={{
+                  backgroundColor: "white",
+                  width: "80%",
+                  borderRadius: 10,
+                  padding: 20,
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 18,
+                    fontWeight: "bold",
+                    marginBottom: 15,
+                    textAlign: "center",
+                  }}
+                >
+                  This Event is a ...
+                </Text>
+                {eventTypes.map((type) => (
+                  <TouchableOpacity
+                    key={type}
+                    onPress={() => {
+                      setEventType(type);
+                      setShowEventTypeModal(false);
+                    }}
+                    style={{
+                      padding: 15,
+                      borderBottomWidth: 1,
+                      borderBottomColor: "#eeeeee",
+                    }}
+                  >
+                    <Text>{type}</Text>
+                  </TouchableOpacity>
+                ))}
+                <TouchableOpacity
+                  onPress={() => setShowEventTypeModal(false)}
+                  style={{
+                    padding: 15,
+                    alignItems: "center",
+                    marginTop: 10,
+                    backgroundColor: "#f8f8f8",
+                    borderRadius: 5,
+                  }}
+                >
+                  <Text style={{ color: "#555" }}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
+
+          {/* Society Name (conditionally shown based on event type) */}
+          {(eventType === "Event Held by a Club" ||
+            eventType === "Event Held by a Society") && (
+            <>
+              <Text style={{ fontWeight: "600" }}>
+                {eventType === "Event Held by a Club"
+                  ? "Club Name"
+                  : "Society Name"}
+              </Text>
+              <TextInput
+                placeholder={`Enter ${eventType === "Event Held by a Club" ? "club" : "society"} name`}
+                value={societyName}
+                onChangeText={setSocietyName}
+                style={{
+                  borderWidth: 1,
+                  padding: 10,
+                  borderRadius: 8,
+                  marginBottom: 15,
+                }}
+              />
+            </>
+          )}
 
           <Text style={{ fontWeight: "600" }}>Select Date</Text>
           <TouchableOpacity

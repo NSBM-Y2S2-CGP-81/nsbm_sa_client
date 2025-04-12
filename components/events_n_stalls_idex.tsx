@@ -40,7 +40,7 @@ export default function EventsAndStallsScroller({
 
 const styles = StyleSheet.create({
   scrollContainer: {
-    paddingVertical: 10,
+    paddingVertical: 5,
   },
   card: {
     backgroundColor: "#d6e1ed",
@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderRadius: 8,
     marginHorizontal: 16,
-    marginBottom: 16,
+    marginBottom: 5,
     overflow: "hidden",
   },
   backgroundImage: {

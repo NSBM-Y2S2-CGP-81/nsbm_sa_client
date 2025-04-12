@@ -85,7 +85,18 @@ export default function HomeScreen() {
 
   const handlePress = () => {
     Vibration.vibrate(10);
-    router.push("/event-list");
+    try {
+      router.push("/event-list");
+    } catch (error) {
+      console.error("Navigation error:", error);
+      router.replace("/event-list");
+      Toast.show({
+        type: "error",
+        position: "bottom",
+        text1: "Navigation Error",
+        text2: "There was an issue navigating to events.",
+      });
+    }
   };
 
   const handleNewsPress = async () => {
@@ -128,133 +139,135 @@ export default function HomeScreen() {
   return (
     <AppProvider>
       <Stack.Screen options={{ headerShown: false }} />
-    
-        <View style={styles.header}>
-          <View style={styles.ServicesMenu}>
-            <Ionicons
-              name="grid"
-              size={24}
-              color="#1B5E20"
-              onPress={() => {
-                Vibration.vibrate(10);
-                router.push("/service-menu");
-              }}
-            />
-          </View>
-          <Text style={styles.greeting}>
-            Welcome back, {fullName.split(" ")[0] || "User"} !
-          </Text>
-          <View style={styles.profileIcon}>
-            <Ionicons
-              name="person"
-              size={24}
-              color="#1B5E20"
-              onPress={() => {
-                Vibration.vibrate(10);
-                router.push("/(main_screen)/user-profile");
-              }}
-            />
-          </View>
-        </View>
-        <ScrollView style={styles.container}>
-          <Carousel
-            mode="parallax"
-            width={width}
-            height={width / 1.5}
-            data={images}
-            loop={true}
-            modeConfig={{
-              parallaxScrollingScale: 0.9,
-              parallaxScrollingOffset: 90,
+
+      <View style={styles.header}>
+        <View style={styles.ServicesMenu}>
+          <Ionicons
+            name="grid"
+            size={24}
+            color="#1B5E20"
+            onPress={() => {
+              Vibration.vibrate(10);
+              router.push("/service-menu");
             }}
-            onProgressChange={(_, absoluteProgress) =>
-              (progress.value = absoluteProgress)
-            }
-            renderItem={({ item, index }) => (
-              <View style={styles.carouselItem}>
-                <Image
-                  style={styles.carouselImage}
-                  source={{ uri: item }}
-                  resizeMode={FastImage.resizeMode.cover}
-                />
-                <Text
-                  style={[
-                    styles.Headings,
-                    index === 0 && { fontStyle: "italic", fontWeight: "bold" },
-                  ]}
-                >
-                  {index === 0
-                    ? '"Connecting Campus Life, One App at a Time."'
-                    : "Clicks by Community"}
-                </Text>
-              </View>
-            )}
           />
-          <Pagination.Basic
-            progress={progress}
-            data={images}
-            dotStyle={{ backgroundColor: "#AFD9AF", borderRadius: 100 }}
-            containerStyle={{ gap: 5, marginTop: 10 }}
+        </View>
+        <Text style={styles.greeting}>
+          Welcome back, {fullName.split(" ")[0] || "User"} !
+        </Text>
+        <View style={styles.profileIcon}>
+          <Ionicons
+            name="person"
+            size={24}
+            color="#1B5E20"
+            onPress={() => {
+              Vibration.vibrate(10);
+              router.push("/(main_screen)/user-profile");
+            }}
           />
-
-          <Text style={styles.sectionTitle}>Events & Stalls</Text>
-          <ScrollView
-            horizontal
-            contentContainerStyle={styles.eventsScrollContainer}
-            showsHorizontalScrollIndicator={false}
-          >
-            {events.map((event, index) => (
-              <EventsAndStallsScroller
-                key={index}
-                heading={event.event_name}
-                subtitle={event.event_venue}
-                venues={event.event_date}
-                image={event.event_image}
+        </View>
+      </View>
+      <ScrollView style={styles.container}>
+        <Carousel
+          mode="parallax"
+          width={width}
+          height={width / 1.5}
+          data={images}
+          loop={true}
+          modeConfig={{
+            parallaxScrollingScale: 0.9,
+            parallaxScrollingOffset: 90,
+          }}
+          onProgressChange={(_, absoluteProgress) =>
+            (progress.value = absoluteProgress)
+          }
+          renderItem={({ item, index }) => (
+            <View style={styles.carouselItem}>
+              <Image
+                style={styles.carouselImage}
+                source={{ uri: item }}
+                resizeMode={FastImage.resizeMode.cover}
               />
-            ))}
-            <TouchableOpacity
-              onPress={handlePress}
-              style={styles.arrowContainer}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="arrow-forward" size={24} color="#1B5E20" />
-            </TouchableOpacity>
-          </ScrollView>
+              <Text
+                style={[
+                  styles.Headings,
+                  index === 0 && { fontStyle: "italic", fontWeight: "bold" },
+                ]}
+              >
+                {index === 0
+                  ? '"Connecting Campus Life, One App at a Time."'
+                  : "Clicks by Community"}
+              </Text>
+            </View>
+          )}
+        />
+        <Pagination.Basic
+          progress={progress}
+          data={images}
+          dotStyle={{ backgroundColor: "#AFD9AF", borderRadius: 100 }}
+          containerStyle={{ gap: 5, marginTop: 10 }}
+        />
 
-          <Text style={styles.sectionTitle}>Latest News</Text>
-          <View>
-            {Array.isArray(newsData) && newsData.length > 0 ? (
-              <Carousel
-                mode="normal"
-                width={width * 1}
-                height={width / 1.2}
-                data={newsData}
-                loop={true}
-                modeConfig={{
-                  parallaxScrollingScale: 1,
-                  parallaxScrollingOffset: 100,
-                }}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    onPress={handleNewsPress}
-                    style={styles.newsContainer}
-                    activeOpacity={0.8}
-                  >
-                    <View style={styles.tintOverlay} />
-                    <Text style={styles.newsTitle}>{item.news_title}</Text>
-                    <Image
-                      source={{ uri: item.image }}
-                      style={styles.newsCarouselImage}
-                    />
-                  </TouchableOpacity>
-                )}
-              />
-            ) : (
-              <Text style={{ alignSelf: "center" }}>No news available</Text>
-            )}
-          </View>
+        <Text style={styles.sectionTitle}>Events & Stalls</Text>
+        <ScrollView
+          horizontal
+          contentContainerStyle={styles.eventsScrollContainer}
+          showsHorizontalScrollIndicator={false}
+        >
+          {events.map((event, index) => (
+            <EventsAndStallsScroller
+              key={index}
+              heading={event.event_name}
+              subtitle={event.event_venue}
+              venues={event.event_date}
+              image={event.event_image}
+            />
+          ))}
         </ScrollView>
-      
+        <View style={styles.arrowContainer}>
+          <TouchableOpacity
+            onPress={handlePress}
+            style={styles.arrowButton}
+            activeOpacity={0.7}
+            // hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <Ionicons name="arrow-forward" size={14} color="#1B5E20" />
+          </TouchableOpacity>
+        </View>
+
+        <Text style={styles.sectionTitle}>Latest News</Text>
+        <View>
+          {Array.isArray(newsData) && newsData.length > 0 ? (
+            <Carousel
+              mode="normal"
+              width={width * 1}
+              height={width / 1.2}
+              data={newsData}
+              loop={true}
+              modeConfig={{
+                parallaxScrollingScale: 1,
+                parallaxScrollingOffset: 100,
+              }}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  onPress={handleNewsPress}
+                  style={styles.newsContainer}
+                  activeOpacity={0.8}
+                >
+                  <View style={styles.tintOverlay} />
+                  <Text style={styles.newsTitle}>{item.news_title}</Text>
+                  <Image
+                    source={{ uri: item.image }}
+                    style={styles.newsCarouselImage}
+                  />
+                </TouchableOpacity>
+              )}
+            />
+          ) : (
+            <Text style={{ alignSelf: "center" }}>No news available</Text>
+          )}
+        </View>
+      </ScrollView>
     </AppProvider>
   );
 }
@@ -345,18 +358,18 @@ const styles = StyleSheet.create({
     color: "#1B5E20",
   },
   eventsScrollContainer: {
-    paddingHorizontal: 16,
-    paddingRight: 24, // Ensure arrow is fully visible
+    paddingHorizontal: 0,
+    paddingRight: 0, // Ensure arrow is fully visible
     alignItems: "center", // Center items vertically
   },
   arrowContainer: {
-    width: 50,
-    height: 50,
+    width: 100,
+    height: 35,
     backgroundColor: "#C8E6C9",
     borderRadius: 25, // Circular shape
     alignItems: "center",
     justifyContent: "center",
-    marginLeft: 8, // Space from last event
+    // marginLeft: 8, // Space from last event
     alignSelf: "center", // Center vertically
   },
 });

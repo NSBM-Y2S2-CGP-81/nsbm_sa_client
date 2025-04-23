@@ -485,6 +485,7 @@ const CreateEventScreen = ({ navigation }) => {
               borderRadius: 8,
               marginBottom: 10,
             }}
+
           >
             <Ionicons
               name="attach"
@@ -492,6 +493,8 @@ const CreateEventScreen = ({ navigation }) => {
               color="white"
               style={{ marginRight: 10 }}
             />
+
+            
             <Text style={{ color: "white" }}>Attach File</Text>
           </TouchableOpacity>
 

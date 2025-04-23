@@ -24,6 +24,7 @@
     "@react-navigation/native": "^7.0.14",
     "@react-navigation/stack": "^7.1.1",
     "axios": "^1.7.9",
+    "cors": "^2.8.5",
     "expo": "~52.0.41",
     "expo-blur": "~14.0.3",
     "expo-constants": "~17.0.7",
@@ -39,6 +40,8 @@
     "expo-symbols": "~0.2.1",
     "expo-system-ui": "~4.0.8",
     "expo-web-browser": "~14.0.2",
+    "express": "^5.1.0",
+    "mongoose": "^8.13.2",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-native": "^0.76.7",
@@ -49,6 +52,7 @@
     "react-native-fast-image": "^8.6.3",
     "react-native-gesture-handler": "~2.20.2",
     "react-native-linear-gradient": "^2.8.3",
+    "react-native-maps": "^1.22.6",
     "react-native-picker-select": "^9.3.1",
     "react-native-reanimated": "~3.16.1",
     "react-native-reanimated-carousel": "^4.0.0",
@@ -73,5 +77,9 @@
     "react-test-renderer": "18.3.1",
     "typescript": "^5.3.3"
   },
-  "private": true
+  "private": true,
+  "description": "1. Install dependencies",
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }

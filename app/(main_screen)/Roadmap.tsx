@@ -1,98 +1,154 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
-import RNPickerSelect from 'react-native-picker-select';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { SelectList } from 'react-native-dropdown-select-list';
+import { useRouter } from 'expo-router';
+import { Stack } from 'expo-router';
+import TopNavigationComponent from '@/components/topNavigationComponent'; // Ensure this path is correct
 
-const UniversityMapScreen = () => {
-  const [mapType, setMapType] = useState<'standard' | 'satellite' | 'hybrid'>('satellite');
-  const [selectedLocation, setSelectedLocation] = useState('pool');
+export default function UniversityMap() {
+  const [selectedLocation, setSelectedLocation] = useState('');
+  const [selectedTab, setSelectedTab] = useState('Map');
+  const router = useRouter();
 
-  const locationCoords = {
-    pool: { latitude: 6.8218, longitude: 80.0415, title: 'NSBM Swimming Pool' },
-    library: { latitude: 6.8207, longitude: 80.0409, title: 'NSBM Library' },
-    playground: { latitude: 6.8221, longitude: 80.0421, title: 'NSBM Playground' },
-  };
-
-  const region = {
-    latitude: locationCoords[selectedLocation].latitude,
-    longitude: locationCoords[selectedLocation].longitude,
-    latitudeDelta: 0.0015,
-    longitudeDelta: 0.0015,
-  };
+ 
+  const data = [
+    { key: 'FrontOffice', value: 'Front Office' },
+    { key: 'Bank', value: 'Bank' },
+    { key: 'FoodCity', value: 'Food City' },
+    { key: 'FOE', value: 'FOE' },
+    { key: 'FOC', value: 'FOC' },
+    { key: 'FOB', value: 'FOB' },
+    { key: 'StudentCenter', value: 'Student Center' },
+    { key: 'Library', value: 'Library' },
+    { key: 'Medicalcenter', value: 'Medical Center' },
+    { key: 'Swimming Pool', value: 'Swimming Pool' },
+    { key: 'GYM', value: 'GYM' },
+    { key: 'Ground',value:'Ground'},
+    { key: 'Hostel', value: 'Hostel' },
+  ];
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.header}>University Map</Text>
+    <>
+      {/* Stack screen for header settings */}
+      <Stack.Screen options={{ headerShown: false }} />
 
-      <View style={styles.controlPanel}>
-        <TouchableOpacity style={styles.button} onPress={() => setMapType('standard')}>
-          <Text>Map</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => setMapType('hybrid')}>
-          <Text>Road Map</Text>
-        </TouchableOpacity>
+      {/* Top navigation bar component */}
+      <TopNavigationComponent
+        title="University Map"
+        subtitle=""
+        navigateTo="/(main_screen)/service-menu"
+      />
 
-        <View style={styles.dropdown}>
-          <RNPickerSelect
-            value={selectedLocation}
-            onValueChange={(value) => setSelectedLocation(value)}
-            items={[
-              { label: 'Swimming Pool', value: 'pool' },
-              { label: 'Library', value: 'library' },
-              { label: 'Playground', value: 'playground' },
-            ]}
+      <ScrollView style={styles.container}>
+        {/* Tab Buttons */}
+        <View style={styles.tabContainer}>
+          <TouchableOpacity
+            style={[styles.tabButton, selectedTab === 'Map' && styles.activeTab]}
+            onPress={() => {
+              setSelectedTab('Map');
+              router.push("/(main_screen)/map");
+            }}
+          >
+            <Text style={[styles.tabText, selectedTab === 'Map' && styles.activeTabText]}>
+              Map
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.tabButton, selectedTab === 'Road Map' && styles.activeTab]}
+            onPress={() => {
+              setSelectedTab('Road Map');
+              router.push("/(main_screen)/Roadmap");
+            }}
+          >
+            <Text style={[styles.tabText, selectedTab === 'Road Map' && styles.activeTabText]}>
+              Road Map
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Dropdown for Location Selection */}
+        <View style={styles.contentContainer}>
+          <Text style={styles.text}>Select a Location</Text>
+          <SelectList
+            setSelected={setSelectedLocation} // Hook to update selected location
+            data={data} // Dropdown items
+            save="value" // Save the value of the selected item
+            boxStyles={styles.selectList} // Custom styles for the dropdown box
+            inputStyles={styles.input} // Custom styles for the input
           />
         </View>
-      </View>
-
-      <MapView
-        style={styles.map}
-        provider={PROVIDER_GOOGLE}
-        mapType={mapType}
-        region={region}
-      >
-        <Marker
-          coordinate={{
-            latitude: locationCoords[selectedLocation].latitude,
-            longitude: locationCoords[selectedLocation].longitude,
-          }}
-          title={locationCoords[selectedLocation].title}
-        />
-      </MapView>
-    </SafeAreaView>
+      </ScrollView>
+    </>
   );
-};
-
-export default UniversityMapScreen;
+}
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  header: {
-    backgroundColor: '#C6EBC5',
-    textAlign: 'center',
-    fontSize: 18,
-    fontWeight: '600',
-    padding: 12,
+  container: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+    padding: 10,
   },
-  controlPanel: {
+  tabContainer: {
     flexDirection: 'row',
-    padding: 8,
-    backgroundColor: '#f1f1f1',
-    justifyContent: 'space-around',
+    justifyContent: 'center',
+    marginVertical: 15,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 12,
+    padding: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  tabButton: {
+    flex: 1,
+    paddingVertical: 12,
+    backgroundColor: '#4CAF50', // Green background for tabs
+    borderRadius: 8,
     alignItems: 'center',
+    marginHorizontal: 4,
+    borderWidth: 2,
+    borderColor: 'white', // White border for tabs
   },
-  button: {
-    backgroundColor: '#ddd',
-    paddingVertical: 6,
-    paddingHorizontal: 14,
-    borderRadius: 6,
+  activeTab: {
+    backgroundColor: '#388E3C', // Dark green for active tab
+    borderWidth: 2,
+    borderColor: 'white',
   },
-  dropdown: {
-    flex: 1,
-    marginLeft: 10,
+  tabText: {
+    fontWeight: '600',
+    color: '#fff', // White text for all tabs
   },
-  map: {
-    flex: 1,
+  activeTabText: {
+    color: '#fff', // White text for active tab
+  },
+  contentContainer: {
+    marginTop: 20,
+    alignItems: 'center',
+    paddingHorizontal: 15,
+  },
+  text: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#333',
+  },
+  selectList: {
+    borderColor: '#4CAF50',
+    borderWidth: 2,
+    borderRadius: 8,
+    width: '100%',
+    marginBottom: 20,
+  },
+  input: {
+    fontSize: 16,
+    paddingHorizontal: 10,
+  },
+  selectedLocation: {
+    fontSize: 16,
+    marginTop: 20,
+    color: '#555',
   },
 });
-

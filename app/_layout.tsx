@@ -1,4 +1,7 @@
+import 'react-native-gesture-handler';
+import React from "react";
 import { Stack } from "expo-router";
+
 export default function Layout() {
   return (
     <Stack>
@@ -39,6 +42,10 @@ export default function Layout() {
       />
       <Stack.Screen
         name="(main_screen)/user-profile"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen 
+        name="(main_screen)/food"
         options={{ headerShown: false }}
       />
     </Stack>

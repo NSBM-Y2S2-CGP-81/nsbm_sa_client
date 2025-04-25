@@ -1,6 +1,14 @@
 import { StyleSheet, Text, View, Image, Pressable } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
+// Create the same image mapping
+const imageMapping = {
+  "Finagle_Cafe.jpg": require("../../../assets/data/images/Finagle_Cafe.jpg"),
+  "restaurant1.jpeg": require("../../../assets/images/restaurant1.jpeg"),
+  "restaurant4.jpeg": require("../../../assets/images/restaurant4.jpeg"),
+  // Add any other images you need
+};
+
 const RestaurantItem = ({ restaurant }) => {
   const navigation = useNavigation();
 
@@ -8,14 +16,24 @@ const RestaurantItem = ({ restaurant }) => {
     navigation.navigate("Restaurant", { id: restaurant.id });
   };
 
+  // Function to get the correct image source
+  const getImageSource = () => {
+    // First try to use the image mapping
+    const imageName = restaurant.image.startsWith("/")
+      ? restaurant.image.split("/").pop()
+      : restaurant.image;
+
+    if (imageMapping[imageName]) {
+      return imageMapping[imageName];
+    }
+
+    // Fallback to a default image
+    return require("../../../assets/images/default.png");
+  };
+
   return (
     <Pressable onPress={onPress} style={styles.restaurantContainer}>
-      <Image
-        source={{
-          uri: restaurant.image,
-        }}
-        style={styles.image}
-      />
+      <Image source={getImageSource()} style={styles.image} />
       <View style={styles.row}>
         <View>
           <Text style={styles.title}>{restaurant.name}</Text>
@@ -42,8 +60,10 @@ const styles = StyleSheet.create({
   },
   image: {
     width: "100%",
-    aspectRatio: 5 / 3,
+    height: 240, // Make it smaller in height
+    aspectRatio: 5 / 3, // Make it wider
     marginBottom: 5,
+    borderRadius: 8, // Optional: add rounded corners
   },
   title: {
     fontSize: 16,

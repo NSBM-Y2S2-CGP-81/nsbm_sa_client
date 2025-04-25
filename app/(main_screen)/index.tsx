@@ -214,16 +214,33 @@ export default function HomeScreen() {
           contentContainerStyle={styles.eventsScrollContainer}
           showsHorizontalScrollIndicator={false}
         >
-          {events.map((event, index) => (
-            <EventsAndStallsScroller
-              key={index}
-              heading={event.event_name}
-              subtitle={event.event_venue}
-              venues={event.event_date}
-              status={event.event_status}
-              image={event.event_image}
-            />
-          ))}
+          {events && events.length > 0 ? (
+            events.map((event, index) => {
+              try {
+                return (
+                  <EventsAndStallsScroller
+                    key={index}
+                    heading={event?.event_name || "Untitled Event"}
+                    subtitle={event?.event_venue || "TBA"}
+                    venues={event?.event_date || "TBA"}
+                    status={event?.event_status || "Unknown"}
+                    image={event?.event_image || ""}
+                  />
+                );
+              } catch (error) {
+                console.error("Error rendering event:", error);
+                return (
+                  <View key={index} style={{ padding: 10 }}>
+                    <Text>Failed to load event</Text>
+                  </View>
+                );
+              }
+            })
+          ) : (
+            <View style={{ padding: 20, alignItems: "center" }}>
+              <Text>No events available at the moment</Text>
+            </View>
+          )}
         </ScrollView>
         <View style={styles.arrowContainer}>
           <TouchableOpacity
@@ -240,7 +257,7 @@ export default function HomeScreen() {
         <View>
           {Array.isArray(newsData) && newsData.length > 0 ? (
             <Carousel
-              mode="normal"
+              mode="parallax"
               width={width * 1}
               height={width / 1.2}
               data={newsData}
@@ -249,20 +266,42 @@ export default function HomeScreen() {
                 parallaxScrollingScale: 1,
                 parallaxScrollingOffset: 100,
               }}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  onPress={handleNewsPress}
-                  style={styles.newsContainer}
-                  activeOpacity={0.8}
-                >
-                  <View style={styles.tintOverlay} />
-                  <Text style={styles.newsTitle}>{item.news_title}</Text>
-                  <Image
-                    source={{ uri: item.image }}
-                    style={styles.newsCarouselImage}
-                  />
-                </TouchableOpacity>
-              )}
+              renderItem={({ item }) => {
+                try {
+                  return (
+                    <TouchableOpacity
+                      onPress={handleNewsPress}
+                      style={styles.newsContainer}
+                      activeOpacity={0.8}
+                    >
+                      <View style={styles.tintOverlay} />
+                      <Text style={styles.newsTitle}>
+                        {item?.news_title || "News title unavailable"}
+                      </Text>
+                      <Image
+                        source={{
+                          uri:
+                            item?.image ||
+                            "https://cssl.nsbm.ac.lk/wp-content/uploads/2023/07/NSBM-LOGO.png",
+                        }}
+                        style={styles.newsCarouselImage}
+                        onError={() => {
+                          console.log("Failed to load news image");
+                        }}
+                      />
+                    </TouchableOpacity>
+                  );
+                } catch (error) {
+                  console.error("Error rendering news item:", error);
+                  return (
+                    <View style={styles.newsContainer}>
+                      <Text style={styles.newsTitle}>
+                        Failed to load news item
+                      </Text>
+                    </View>
+                  );
+                }
+              }}
             />
           ) : (
             <Text style={{ alignSelf: "center" }}>No news available</Text>

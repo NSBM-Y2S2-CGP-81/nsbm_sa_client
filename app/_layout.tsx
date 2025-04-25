@@ -1,6 +1,12 @@
 import 'react-native-gesture-handler';
 import React from "react";
-import { Stack } from "expo-router";
+import { Stack, router } from "expo-router";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { StyleSheet } from "react-native";
+import { AppProvider } from "@/app/services/GlobalContext"; // Keep AppProvider for other context needs
+import { StatusBar } from "expo-status-bar";
+import { useEffect } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Layout() {
   return (

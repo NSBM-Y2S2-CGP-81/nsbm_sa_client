@@ -32,7 +32,7 @@ const menuItems = [
     title: "Food",
     icon: "utensils",
     color: "#2A6A6C", // Dark Green
-    navigateTo: "../../src/navigation/index.js",
+    navigateTo: "/(main_screen)/food", // Updated to use the new screen
   },
   {
     title: "University Map",
@@ -82,6 +82,10 @@ export default function ServiceMenu() {
   return (
     <>
       <Stack.Screen options={{ headerShown: false }} />
+      <Stack.Screen
+        name="(main_screen)/food"
+        options={{ headerShown: false }}
+      />
       {/* <TopNavigationComponent
         title={"Welcome to Services"}
         subtitle={""}

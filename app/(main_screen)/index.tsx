@@ -257,6 +257,7 @@ export default function HomeScreen() {
         <View>
           {Array.isArray(newsData) && newsData.length > 0 ? (
             <Carousel
+
               mode="parallax"
               width={width * 1}
               height={width / 1.2}
@@ -361,7 +362,8 @@ const styles = StyleSheet.create({
   tintOverlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: "rgba(144, 238, 144, 0.3)",
-    borderRadius: 10,
+    borderRadius: 0,
+    width: "100%",
   },
   carouselItem: {
     flex: 1,

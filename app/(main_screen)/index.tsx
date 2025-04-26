@@ -257,7 +257,8 @@ export default function HomeScreen() {
         <View>
           {Array.isArray(newsData) && newsData.length > 0 ? (
             <Carousel
-              mode="simple"
+
+              mode="parallax"
               width={width * 1}
               height={width / 1.2}
               data={newsData}

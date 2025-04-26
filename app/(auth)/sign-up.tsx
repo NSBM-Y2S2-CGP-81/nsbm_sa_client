@@ -9,9 +9,8 @@ import {
   ScrollView,
 } from "react-native";
 import CustomText from "@/components/CustomText";
-import { Picker } from "@react-native-picker/picker";
 import SERVER_ADDRESS from "@/config";
-import Toast from "react-native-toast-message"; // Add Toast library
+import Toast from "react-native-toast-message";
 import { Stack, router } from "expo-router";
 
 interface Credentials {
@@ -39,10 +38,29 @@ const SignUpScreen: React.FC = () => {
   const [nic, setNic] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [signType, setSignType] = useState<string>("Student");
+  const [signType, setSignType] = useState<string>("");
   const [phone, setPhoneNo] = useState<string>("");
   const [faculty, setFaculty] = useState<string>("");
   const [availableDegrees, setAvailableDegrees] = useState<string[]>([]);
+  const [passwordError, setPasswordError] = useState<string>("");
+
+  const universities = [
+    "NSBM Green University",
+    "University of Plymouth",
+    "Victoria University",
+    "Other",
+  ];
+
+  const intakes = ["22.1", "22.2", "23.1", "23.2", "24.1", "24.2"];
+
+  const faculties = [
+    "Faculty of Computing",
+    "Faculty of Business",
+    "Faculty of Engineering",
+    "Faculty of Science",
+  ];
+
+  const userTypes = ["Student", "Lecturer"];
 
   const storeData = async (key: string, value: string) => {
     try {
@@ -53,7 +71,35 @@ const SignUpScreen: React.FC = () => {
     }
   };
 
+  const validatePassword = (password: string): boolean => {
+    if (password.length < 8) {
+      setPasswordError("Password must be at least 8 characters long");
+      return false;
+    }
+    if (!/[A-Z]/.test(password)) {
+      setPasswordError("Password must contain at least one capital letter");
+      return false;
+    }
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+      setPasswordError("Password must contain at least one special character");
+      return false;
+    }
+    setPasswordError("");
+    return true;
+  };
+
   const handleSignIn = async () => {
+    // Validate password before proceeding
+    if (!validatePassword(password)) {
+      Toast.show({
+        type: "error",
+        position: "top",
+        text1: "Password Error",
+        text2: passwordError,
+      });
+      return;
+    }
+
     const currentDateTime = new Date().toISOString();
     const credentials: Credentials = {
       full_name: name,
@@ -116,11 +162,13 @@ const SignUpScreen: React.FC = () => {
 
   const handleFacultyChange = (faculty: string) => {
     setFaculty(faculty);
+    setDegree(""); // Reset degree when faculty changes
 
     switch (faculty) {
       case "Faculty of Computing":
         setAvailableDegrees([
           "Computer Science",
+          "Data Science",
           "Computer Networks",
           "Computer Security",
           "Software Engineering",
@@ -154,31 +202,60 @@ const SignUpScreen: React.FC = () => {
     }
   };
 
+  // Radio Button Component
+  const RadioButton = ({
+    label,
+    selected,
+    onPress,
+  }: {
+    label: string;
+    selected: boolean;
+    onPress: () => void;
+  }) => {
+    return (
+      <TouchableOpacity style={styles.radioContainer} onPress={onPress}>
+        <View style={[styles.radioCircle, selected && styles.radioSelected]}>
+          {selected && <View style={styles.radioInnerCircle} />}
+        </View>
+        <CustomText style={styles.radioLabel}>{label}</CustomText>
+      </TouchableOpacity>
+    );
+  };
+
   return (
     <View style={styles.container}>
       <Stack.Screen options={{ headerShown: false }} />
-      <Image
-        source={require("../../assets/images/nsbm_logo.png")}
-        style={styles.logo}
-      />
-      <CustomText style={styles.title}>Sign Up</CustomText>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        scrollEnabled={true}
+        nestedScrollEnabled={true}
+      >
+        <Image
+          source={require("../../assets/images/nsbm_logo.png")}
+          style={styles.logo}
+        />
+        <CustomText style={styles.title}>Sign Up</CustomText>
 
-      <View style={styles.form}>
-        <ScrollView>
-          <CustomText style={styles.label}>Full Name: </CustomText>
+        <View style={styles.form}>
+          <CustomText style={styles.label}>Full Name</CustomText>
           <TextInput
             style={styles.input}
             placeholder="Enter Name Here"
             value={name}
             onChangeText={setName}
+            autoCapitalize="words"
           />
 
-          <CustomText style={styles.label}>Student ID: </CustomText>
+          <CustomText style={styles.label}>Student ID</CustomText>
           <TextInput
             style={styles.input}
             placeholder="Enter ID Here"
             value={studentid}
             onChangeText={setStudentId}
+            autoCapitalize="none"
           />
 
           <CustomText style={styles.label}>NSBM Email</CustomText>
@@ -187,6 +264,8 @@ const SignUpScreen: React.FC = () => {
             placeholder="someone@students.nsbm.ac.lk"
             value={mail}
             onChangeText={setMail}
+            keyboardType="email-address"
+            autoCapitalize="none"
           />
 
           <CustomText style={styles.label}>Password</CustomText>
@@ -195,75 +274,81 @@ const SignUpScreen: React.FC = () => {
             placeholder="********"
             secureTextEntry
             value={password}
-            onChangeText={setPassword}
+            onChangeText={(text) => {
+              setPassword(text);
+              if (text.length > 0) {
+                validatePassword(text);
+              } else {
+                setPasswordError("");
+              }
+            }}
+            autoCapitalize="none"
           />
+          {passwordError ? (
+            <CustomText style={styles.errorText}>{passwordError}</CustomText>
+          ) : null}
 
-          <CustomText style={styles.label}>Enter Intake Value: </CustomText>
-          <Picker
-            selectedValue={intake}
-            onValueChange={(itemValue) => setIntake(itemValue)}
-            style={styles.picker}
-          >
-            {["22.1", "22.2", "23.1", "23.2", "24.1", "24.2", "24.3"].map(
-              (item) => (
-                <Picker.Item key={item} label={item} value={item} />
-              ),
-            )}
-          </Picker>
-
-          <CustomText style={styles.label}>Faculty</CustomText>
-          <Picker
-            selectedValue={faculty}
-            onValueChange={(itemValue) => handleFacultyChange(itemValue)}
-            style={styles.picker}
-          >
-            <Picker.Item
-              label="Faculty of Computing"
-              value="Faculty of Computing"
-            />
-            <Picker.Item
-              label="Faculty of Business"
-              value="Faculty of Business"
-            />
-            <Picker.Item
-              label="Faculty of Engineering"
-              value="Faculty of Engineering"
-            />
-            <Picker.Item
-              label="Faculty of Science"
-              value="Faculty of Science"
-            />
-          </Picker>
-
-          <CustomText style={styles.label}>Enter Your Degree:</CustomText>
-          <Picker
-            selectedValue={degree}
-            onValueChange={(itemValue) => setDegree(itemValue)}
-            style={styles.picker}
-          >
-            {availableDegrees.map((degreeOption) => (
-              <Picker.Item
-                key={degreeOption}
-                label={degreeOption}
-                value={degreeOption}
+          <CustomText style={styles.label}>Intake</CustomText>
+          <View style={styles.radioGroup}>
+            {intakes.map((item) => (
+              <RadioButton
+                key={item}
+                label={item}
+                selected={intake === item}
+                onPress={() => setIntake(item)}
               />
             ))}
-          </Picker>
+          </View>
 
-          <CustomText style={styles.label}>Offering University:</CustomText>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter University Name Here"
-            value={university}
-            onChangeText={setUniversity}
-          />
+          <CustomText style={styles.label}>Faculty</CustomText>
+          <View style={styles.radioGroup}>
+            {faculties.map((item) => (
+              <RadioButton
+                key={item}
+                label={item}
+                selected={faculty === item}
+                onPress={() => handleFacultyChange(item)}
+              />
+            ))}
+          </View>
 
-          <CustomText style={styles.label}>Enter Your NIC:</CustomText>
+          <CustomText style={styles.label}>Degree</CustomText>
+          <View style={styles.radioGroup}>
+            {availableDegrees.length > 0 ? (
+              availableDegrees.map((degreeOption) => (
+                <RadioButton
+                  key={degreeOption}
+                  label={degreeOption}
+                  selected={degree === degreeOption}
+                  onPress={() => setDegree(degreeOption)}
+                />
+              ))
+            ) : (
+              <CustomText style={styles.noOptionsText}>
+                No Degrees Available
+              </CustomText>
+            )}
+          </View>
+
+          <CustomText style={styles.label}>Offering University</CustomText>
+          <View style={styles.radioGroup}>
+            {universities.map((uni) => (
+              <RadioButton
+                key={uni}
+                label={uni}
+                selected={university === uni}
+                onPress={() => setUniversity(uni)}
+              />
+            ))}
+          </View>
+
+          <CustomText style={styles.label}>NIC</CustomText>
           <TextInput
             style={styles.input}
             placeholder="Enter NIC Here"
             value={nic}
             onChangeText={setNic}
+            autoCapitalize="characters"
           />
 
           <CustomText style={styles.label}>Phone Number</CustomText>
@@ -272,19 +357,20 @@ const SignUpScreen: React.FC = () => {
             placeholder="+94"
             value={phone}
             onChangeText={setPhoneNo}
+            keyboardType="phone-pad"
           />
 
-          <CustomText style={styles.label}>
-            Are you a Student or a Lecturer?
-          </CustomText>
-          <Picker
-            selectedValue={signType}
-            onValueChange={(itemValue) => setSignType(itemValue)}
-            style={styles.picker}
-          >
-            <Picker.Item label="Student" value="Student" />
-            <Picker.Item label="Lecturer" value="Lecturer" />
-          </Picker>
+          <CustomText style={styles.label}>User Type</CustomText>
+          <View style={styles.radioGroup}>
+            {userTypes.map((type) => (
+              <RadioButton
+                key={type}
+                label={type}
+                selected={signType === type}
+                onPress={() => setSignType(type)}
+              />
+            ))}
+          </View>
 
           <View style={styles.buttonContainer}>
             <TouchableOpacity
@@ -294,9 +380,8 @@ const SignUpScreen: React.FC = () => {
               <CustomText style={styles.buttonText}>Sign Up</CustomText>
             </TouchableOpacity>
           </View>
-        </ScrollView>
-      </View>
-
+        </View>
+      </ScrollView>
       <Toast />
     </View>
   );
@@ -306,70 +391,113 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#AFD9AF",
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingTop: 20,
+    paddingBottom: 40,
     alignItems: "center",
-    justifyContent: "flex-end",
   },
   logo: {
     width: 250,
     height: 108,
     resizeMode: "contain",
+    alignSelf: "center",
   },
   title: {
-    marginTop: "5%",
-    marginBottom: "5%",
     fontSize: 44,
     fontWeight: "200",
     color: "#ffffff",
-    marginVertical: 10,
+    marginVertical: 20,
+    textAlign: "center",
   },
   form: {
     backgroundColor: "#fff",
-    padding: 30,
-    width: "100%",
-    height: "60%",
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    marginTop: 20,
-    marginBottom: 0,
-    elevation: 0,
+    padding: 20,
+    width: "90%",
+    borderRadius: 20,
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   label: {
-    fontSize: 15,
-    color: "#888",
-    marginBottom: 5,
+    fontSize: 16,
+    color: "#333",
+    marginBottom: 8,
+    fontWeight: "500",
   },
   input: {
-    backgroundColor: "#ffffff",
-    padding: 10,
-    fontSize: 20,
-    fontStyle: "italic",
-    fontWeight: "200",
+    backgroundColor: "#F5F5F5",
+    padding: 12,
+    fontSize: 16,
     borderRadius: 8,
     marginBottom: 15,
+    borderWidth: 1,
+    borderColor: "#DDD",
+  },
+  radioGroup: {
+    marginBottom: 15,
+  },
+  radioContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 8,
+  },
+  radioCircle: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: "#333",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 10,
+  },
+  radioSelected: {
+    borderColor: "#39B54A",
+  },
+  radioInnerCircle: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: "#39B54A",
+  },
+  radioLabel: {
+    fontSize: 16,
+    color: "#333",
+  },
+  noOptionsText: {
+    fontSize: 16,
+    color: "#666",
+    fontStyle: "italic",
   },
   buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 10,
+    marginTop: 20,
+    alignItems: "center",
   },
   button: {
-    flex: 1,
     padding: 15,
     borderRadius: 30,
     alignItems: "center",
+    width: "100%",
   },
   signInButton: {
     backgroundColor: "#39B54A",
-    marginRight: 5,
   },
   buttonText: {
     color: "#fff",
-    fontWeight: "100",
-    fontSize: 16,
+    fontWeight: "600",
+    fontSize: 18,
   },
-  picker: {
-    height: 50,
-    width: "100%",
+  errorText: {
+    color: "red",
+    fontSize: 14,
+    marginTop: -10,
+    marginBottom: 10,
   },
 });
 

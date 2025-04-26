@@ -1,4 +1,5 @@
 import React, { createContext, useState } from "react";
+import { useColorScheme } from "react-native";
 
 export const AppContext = createContext();
 

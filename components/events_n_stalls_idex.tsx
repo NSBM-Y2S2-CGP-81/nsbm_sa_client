@@ -14,8 +14,12 @@ export default function EventsAndStallsScroller({
   subtitle,
   venues,
   image,
+  status,
 }) {
   const router = useRouter();
+
+  // Determine text color based on status
+  const textColor = status === "Upcoming" ? "#0D47A1" : "#EE5722"; // Blue for Upcoming, Orange for others
 
   return (
     <View style={styles.scrollContainer}>
@@ -29,9 +33,15 @@ export default function EventsAndStallsScroller({
           style={styles.backgroundImage}
         />
         <View style={styles.overlay}>
-          <Text style={styles.headingText}>{heading}</Text>
-          <Text style={styles.subtitleText}>{subtitle}</Text>
-          <Text style={styles.venueText}>{venues}</Text>
+          <Text style={[styles.headingText, { color: textColor }]}>
+            {heading}
+          </Text>
+          <Text style={[styles.subtitleText, { color: textColor }]}>
+            {subtitle}
+          </Text>
+          <Text style={[styles.venueText, { color: textColor }]}>
+            {status === "Upcoming" ? venues : status}
+          </Text>
         </View>
       </View>
     </View>
@@ -40,7 +50,7 @@ export default function EventsAndStallsScroller({
 
 const styles = StyleSheet.create({
   scrollContainer: {
-    paddingVertical: 10,
+    paddingVertical: 5,
   },
   card: {
     backgroundColor: "#d6e1ed",
@@ -51,7 +61,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderRadius: 8,
     marginHorizontal: 16,
-    marginBottom: 16,
+    marginBottom: 5,
     overflow: "hidden",
   },
   backgroundImage: {
@@ -63,6 +73,7 @@ const styles = StyleSheet.create({
   overlay: {
     flex: 1,
     alignItems: "center",
+    // color: "#0D47A1",
     justifyContent: "center",
     width: "100%",
     height: "100%",
@@ -70,19 +81,16 @@ const styles = StyleSheet.create({
   headingText: {
     fontSize: 24,
     fontWeight: "400",
-    color: "#0D47A1",
     textAlign: "center",
   },
   subtitleText: {
     fontSize: 25,
     fontWeight: "200",
-    color: "#0D47A1",
     textAlign: "center",
   },
   venueText: {
     fontSize: 10,
     fontWeight: "300",
-    color: "#0D47A1",
     textAlign: "center",
   },
   viewInfoButton: {

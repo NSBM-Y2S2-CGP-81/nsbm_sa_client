@@ -65,14 +65,21 @@ const SignInScreen = () => {
         ),
       );
 
+      // Show toast before navigation
       Toast.show({
         type: "success",
         position: "top",
         text1: "Login Successful",
         text2: "You are now signed in!",
+        visibilityTime: 4000,
+        autoHide: true,
+        topOffset: 50,
       });
 
-      router.replace("/");
+      // Delay navigation to allow toast to be visible
+      setTimeout(() => {
+        router.replace("/");
+      }, 1000);
     } catch (error: unknown) {
       console.error("Login error:", error);
       if (error instanceof Error) {
@@ -81,6 +88,9 @@ const SignInScreen = () => {
           position: "top",
           text1: "Login Failed",
           text2: error.message || "An error occurred. Please try again.",
+          visibilityTime: 4000,
+          autoHide: true,
+          topOffset: 50,
         });
       } else {
         Toast.show({
@@ -88,6 +98,9 @@ const SignInScreen = () => {
           position: "top",
           text1: "Login Failed",
           text2: "An unknown error occurred. Please try again.",
+          visibilityTime: 4000,
+          autoHide: true,
+          topOffset: 50,
         });
       }
     }

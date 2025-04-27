@@ -7,6 +7,7 @@ import {
   ScrollView,
   Dimensions,
   Image,
+  SafeAreaView,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Carousel, { Pagination } from "react-native-reanimated-carousel";
@@ -37,7 +38,7 @@ export default function SeatStuff() {
   const [seatData, setSeatData] = useState([]);
   const [userData, setUserData] = useState([]);
   const progress = useSharedValue(0);
-  const [faculty, setFaculty] = useState([]);
+  const [faculty, setFaculty] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -75,7 +76,9 @@ export default function SeatStuff() {
       try {
         const api = await AsyncStorage.getItem("apiKey");
         const fac_code = await AsyncStorage.getItem("fac_code");
-        setFaculty(fac_code);
+        if (fac_code) {
+          setFaculty(fac_code);
+        }
         console.log(fac_code);
         const fetchedData = await fetchData("crowd_uplink", api);
 
@@ -137,62 +140,70 @@ export default function SeatStuff() {
   }
 
   if (!isLoggedIn) {
-    return null; // Avoid rendering anything if not logged in
     router.push("/(auth)/sign-in");
+    return null; // Avoid rendering anything if not logged in
   }
 
   return (
-    <>
+    <SafeAreaView style={styles.safeArea}>
       <Stack.Screen options={{ headerShown: false }} />
       <TopNavigationComponent
         title={"Seat Availability FOC"}
         subtitle={""}
         navigateTo={"/(main_screen)/seat-availability-main"}
       />
-      <ScrollView
-        style={styles.container}
-        contentContainerStyle={styles.scrollContent}
-      >
-        {seatData.length > 0 ? (
-          seatData
-            .filter((entry) => entry.faculty === faculty)
-            .map((entry) => (
-              <SeatDisplayBox
-                key={entry._id}
-                imageSource={(() => {
-                  switch (entry.AP) {
-                    case "finagle":
-                      return require("@/assets/images/finagle.png");
-                    case "stdnt_center":
-                      return require("@/assets/images/stdc.png");
-                    // case "library":
-                    // return require("@/assets/images/library.png");
-                    // Add more cases as needed
-                    default:
-                      return require("@/assets/images/default.png");
-                  }
-                })()}
-                title={entry.name}
-                seatAvailability={entry.seats}
-              />
-            ))
-        ) : (
-          <Text>Loading seat data...</Text>
-        )}
-      </ScrollView>
-    </>
+      <View style={styles.container}>
+        <ScrollView>
+          {seatData.length > 0 ? (
+            seatData
+              .filter((entry) => entry.faculty === faculty)
+              .map((entry) => (
+                <SeatDisplayBox
+                  key={entry._id}
+                  imageSource={(() => {
+                    switch (entry.AP) {
+                      case "fngl":
+                        return require("@/assets/images/finagle.png");
+                      case "foc2":
+                        return require("@/assets/images/stdc.png");
+                      // case "library":
+                      // return require("@/assets/images/library.png");
+                      // Add more cases as needed
+                      default:
+                        return require("@/assets/images/default.png");
+                    }
+                  })()}
+                  title={entry.name}
+                  seatAvailability={entry.seats}
+                  onPress={() => {}} // Adding empty onPress handler as it's required
+                />
+              ))
+          ) : (
+            <Text style={styles.loadingText}>Loading seat data...</Text>
+          )}
+        </ScrollView>
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+  },
   container: {
     flex: 1,
-    backgroundColor: "#FFFFF",
+    backgroundColor: "#FFFFFF", // Fixed the color code (was missing an F)
   },
   scrollContent: {
-    flexGrow: 1,
-    justifyContent: "center", // Center vertically
+    paddingVertical: 20,
+    paddingHorizontal: 10,
     alignItems: "center", // Center horizontally
+  },
+  loadingText: {
+    marginTop: 20,
+    fontSize: 16,
+    textAlign: "center",
   },
   greeting: {
     fontSize: 18,

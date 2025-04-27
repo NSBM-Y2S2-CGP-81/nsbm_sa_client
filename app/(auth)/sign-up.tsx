@@ -42,6 +42,7 @@ const SignUpScreen: React.FC = () => {
   const [phone, setPhoneNo] = useState<string>("");
   const [faculty, setFaculty] = useState<string>("");
   const [availableDegrees, setAvailableDegrees] = useState<string[]>([]);
+  const [passwordError, setPasswordError] = useState<string>("");
 
   const universities = [
     "NSBM Green University",
@@ -70,7 +71,35 @@ const SignUpScreen: React.FC = () => {
     }
   };
 
+  const validatePassword = (password: string): boolean => {
+    if (password.length < 8) {
+      setPasswordError("Password must be at least 8 characters long");
+      return false;
+    }
+    if (!/[A-Z]/.test(password)) {
+      setPasswordError("Password must contain at least one capital letter");
+      return false;
+    }
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+      setPasswordError("Password must contain at least one special character");
+      return false;
+    }
+    setPasswordError("");
+    return true;
+  };
+
   const handleSignIn = async () => {
+    // Validate password before proceeding
+    if (!validatePassword(password)) {
+      Toast.show({
+        type: "error",
+        position: "top",
+        text1: "Password Error",
+        text2: passwordError,
+      });
+      return;
+    }
+
     const currentDateTime = new Date().toISOString();
     const credentials: Credentials = {
       full_name: name,
@@ -245,9 +274,19 @@ const SignUpScreen: React.FC = () => {
             placeholder="********"
             secureTextEntry
             value={password}
-            onChangeText={setPassword}
+            onChangeText={(text) => {
+              setPassword(text);
+              if (text.length > 0) {
+                validatePassword(text);
+              } else {
+                setPasswordError("");
+              }
+            }}
             autoCapitalize="none"
           />
+          {passwordError ? (
+            <CustomText style={styles.errorText}>{passwordError}</CustomText>
+          ) : null}
 
           <CustomText style={styles.label}>Intake</CustomText>
           <View style={styles.radioGroup}>
@@ -453,6 +492,12 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "600",
     fontSize: 18,
+  },
+  errorText: {
+    color: "red",
+    fontSize: 14,
+    marginTop: -10,
+    marginBottom: 10,
   },
 });
 

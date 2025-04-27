@@ -274,7 +274,8 @@ export default function HomeScreen() {
         <View>
           {Array.isArray(newsData) && newsData.length > 0 ? (
             <Carousel
-              mode="basic"
+
+              mode="simple"
               width={width * 1}
               height={width / 1.2}
               data={newsData}
@@ -379,6 +380,7 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     backgroundColor: "rgba(144, 238, 144, 0.3)",
     borderRadius: 0,
+    width: "100%",
   },
   carouselItem: {
     flex: 1,

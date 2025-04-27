@@ -39,17 +39,39 @@ const CreateEventScreen = ({ navigation }) => {
   const [eventType, setEventType] = useState("");
   const [societyName, setSocietyName] = useState("");
   const [showEventTypeModal, setShowEventTypeModal] = useState(false);
+  const [showSocietyModal, setShowSocietyModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState("");
   const [selectedSociety, setSelectedSociety] = useState("");
   // Registration form link state
   const [registrationLink, setRegistrationLink] = useState("");
+  // Location dropdown state
+  const [showLocationModal, setShowLocationModal] = useState(false);
 
   // Event type options
   const eventTypes = [
     "Event Held by a Club",
     "Event Held by a Society",
     "A Stall",
+  ];
+
+  // Society options
+  const societyOptions = ["IEEE", "FOSS", "HackathonHub"];
+
+  // Location options
+  const locationOptions = [
+    "FOC001",
+    "FOC002",
+    "FOC003",
+    "FOC004",
+    "FOC005",
+    "FOC006",
+    "FOC007",
+    "FOC008",
+    "FOC009",
+    "Auditorium",
+    "MainGate",
+    "OpenArea",
   ];
 
   // Fetch the auth token from AsyncStorage
@@ -349,6 +371,8 @@ const CreateEventScreen = ({ navigation }) => {
                     onPress={() => {
                       setEventType(type);
                       setShowEventTypeModal(false);
+                      // Reset society name when changing event type
+                      setSocietyName("");
                     }}
                     style={{
                       padding: 15,
@@ -376,16 +400,11 @@ const CreateEventScreen = ({ navigation }) => {
           </Modal>
 
           {/* Society Name (conditionally shown based on event type) */}
-          {(eventType === "Event Held by a Club" ||
-            eventType === "Event Held by a Society") && (
+          {eventType === "Event Held by a Club" && (
             <>
-              <Text style={{ fontWeight: "600" }}>
-                {eventType === "Event Held by a Club"
-                  ? "Club Name"
-                  : "Society Name"}
-              </Text>
+              <Text style={{ fontWeight: "600" }}>Club Name</Text>
               <TextInput
-                placeholder={`Enter ${eventType === "Event Held by a Club" ? "club" : "society"} name`}
+                placeholder="Enter club name"
                 value={societyName}
                 onChangeText={setSocietyName}
                 style={{
@@ -395,6 +414,93 @@ const CreateEventScreen = ({ navigation }) => {
                   marginBottom: 15,
                 }}
               />
+            </>
+          )}
+
+          {/* Society Dropdown for "Event Held by a Society" */}
+          {eventType === "Event Held by a Society" && (
+            <>
+              <Text style={{ fontWeight: "600" }}>Society Name</Text>
+              <TouchableOpacity
+                onPress={() => setShowSocietyModal(true)}
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  padding: 10,
+                  borderWidth: 1,
+                  borderRadius: 8,
+                  marginBottom: 15,
+                }}
+              >
+                <Text style={{ flex: 1 }}>
+                  {societyName ? societyName : "Select Society"}
+                </Text>
+                <Ionicons name="chevron-down" size={20} color="black" />
+              </TouchableOpacity>
+
+              {/* Society Selection Modal */}
+              <Modal
+                visible={showSocietyModal}
+                transparent={true}
+                animationType="slide"
+              >
+                <View
+                  style={{
+                    flex: 1,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: "rgba(0,0,0,0.5)",
+                  }}
+                >
+                  <View
+                    style={{
+                      backgroundColor: "white",
+                      width: "80%",
+                      borderRadius: 10,
+                      padding: 20,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: 18,
+                        fontWeight: "bold",
+                        marginBottom: 15,
+                        textAlign: "center",
+                      }}
+                    >
+                      Select Society
+                    </Text>
+                    {societyOptions.map((society) => (
+                      <TouchableOpacity
+                        key={society}
+                        onPress={() => {
+                          setSocietyName(society);
+                          setShowSocietyModal(false);
+                        }}
+                        style={{
+                          padding: 15,
+                          borderBottomWidth: 1,
+                          borderBottomColor: "#eeeeee",
+                        }}
+                      >
+                        <Text>{society}</Text>
+                      </TouchableOpacity>
+                    ))}
+                    <TouchableOpacity
+                      onPress={() => setShowSocietyModal(false)}
+                      style={{
+                        padding: 15,
+                        alignItems: "center",
+                        marginTop: 10,
+                        backgroundColor: "#f8f8f8",
+                        borderRadius: 5,
+                      }}
+                    >
+                      <Text style={{ color: "#555" }}>Cancel</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </Modal>
             </>
           )}
 
@@ -477,17 +583,89 @@ const CreateEventScreen = ({ navigation }) => {
           )}
 
           <Text style={{ fontWeight: "600" }}>Location</Text>
-          <TextInput
-            placeholder="Enter event location"
-            value={location}
-            onChangeText={setLocation}
+          <TouchableOpacity
+            onPress={() => setShowLocationModal(true)}
             style={{
-              borderWidth: 1,
+              flexDirection: "row",
+              alignItems: "center",
               padding: 10,
+              borderWidth: 1,
               borderRadius: 8,
               marginBottom: 10,
             }}
-          />
+          >
+            <Text style={{ flex: 1 }}>
+              {location ? location : "Select Location"}
+            </Text>
+            <Ionicons name="location" size={20} color="black" />
+          </TouchableOpacity>
+
+          {/* Location Selection Modal */}
+          <Modal
+            visible={showLocationModal}
+            transparent={true}
+            animationType="slide"
+          >
+            <View
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+                backgroundColor: "rgba(0,0,0,0.5)",
+              }}
+            >
+              <View
+                style={{
+                  backgroundColor: "white",
+                  width: "80%",
+                  borderRadius: 10,
+                  padding: 20,
+                  maxHeight: "70%",
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 18,
+                    fontWeight: "bold",
+                    marginBottom: 15,
+                    textAlign: "center",
+                  }}
+                >
+                  Select Location
+                </Text>
+                <ScrollView>
+                  {locationOptions.map((loc) => (
+                    <TouchableOpacity
+                      key={loc}
+                      onPress={() => {
+                        setLocation(loc);
+                        setShowLocationModal(false);
+                      }}
+                      style={{
+                        padding: 15,
+                        borderBottomWidth: 1,
+                        borderBottomColor: "#eeeeee",
+                      }}
+                    >
+                      <Text>{loc}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+                <TouchableOpacity
+                  onPress={() => setShowLocationModal(false)}
+                  style={{
+                    padding: 15,
+                    alignItems: "center",
+                    marginTop: 10,
+                    backgroundColor: "#f8f8f8",
+                    borderRadius: 5,
+                  }}
+                >
+                  <Text style={{ color: "#555" }}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
 
           <Text style={{ fontWeight: "600", marginTop: 10 }}>
             Maximum Tickets Available

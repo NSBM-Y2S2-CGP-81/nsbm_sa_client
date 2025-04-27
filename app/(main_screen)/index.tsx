@@ -28,14 +28,29 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 const width = Dimensions.get("window").width;
 
+// Add event interface
+interface Event {
+  event_name: string;
+  event_venue: string;
+  event_date: string;
+  event_status: string;
+  event_image: string;
+}
+
+// Add news interface
+interface NewsItem {
+  news_title: string;
+  image: string;
+}
+
 export default function HomeScreen() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [newsData, setNewsData] = useState([]);
-  const [userData, setUserData] = useState([]);
+  const [newsData, setNewsData] = useState<NewsItem[]>([]);
+  const [userData, setUserData] = useState<any[]>([]);
   const progress = useSharedValue(0);
   const [fullName, setFullName] = useState("Loading...");
   const [loadingstate, setLoadingState] = useState(true);
-  const [events, setEvents] = useState([]);
+  const [events, setEvents] = useState<Event[]>([]);
 
   useEffect(() => {
     const validateLogin = async () => {
@@ -51,7 +66,9 @@ export default function HomeScreen() {
             const result = await fetchData("news", key);
             setNewsData(result);
             const result_events = await fetchData("events", key);
-            setEvents(result_events);
+            // Filter out events with "Declined" status
+            const filteredEvents = result_events.filter((event: Event) => event?.event_status !== "Declined");
+            setEvents(filteredEvents);
           } else {
             Alert.alert("Session Expired", "Please login again");
             router.replace("/(auth)/sign-in");
@@ -257,16 +274,16 @@ export default function HomeScreen() {
         <View>
           {Array.isArray(newsData) && newsData.length > 0 ? (
             <Carousel
-              mode="parallax"
+              mode="basic"
               width={width * 1}
               height={width / 1.2}
               data={newsData}
               loop={true}
               modeConfig={{
-                parallaxScrollingScale: 1,
-                parallaxScrollingOffset: 100,
+                parallaxScrollingScale: 0.9,
+                parallaxScrollingOffset: 90,
               }}
-              renderItem={({ item }) => {
+              renderItem={({ item }: { item: NewsItem }) => {
                 try {
                   return (
                     <TouchableOpacity
@@ -361,7 +378,7 @@ const styles = StyleSheet.create({
   tintOverlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: "rgba(144, 238, 144, 0.3)",
-    borderRadius: 10,
+    borderRadius: 0,
   },
   carouselItem: {
     flex: 1,
@@ -411,5 +428,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     // marginLeft: 8, // Space from last event
     alignSelf: "center", // Center vertically
+  },
+  arrowButton: {
+    width: "100%",
+    height: "100%",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

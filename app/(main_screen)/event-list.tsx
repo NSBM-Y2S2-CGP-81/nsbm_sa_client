@@ -18,14 +18,27 @@ import EventSearchAndGallery from "@/components/eventsAndGallery";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import SERVER_ADDRESS from "@/config";
 
+interface Event {
+  _id: string;
+  event_name: string;
+  event_date: string;
+  event_time: string;
+  event_venue: string;
+  event_image: string;
+  event_status: string;
+  event_link?: string;
+  event_tickets?: string;
+  event_id?: string;
+}
+
 const EventList = () => {
-  const [events, setEvents] = useState([]);
+  const [events, setEvents] = useState<Event[]>([]);
   const [markedDates, setMarkedDates] = useState<
     Record<string, { marked: boolean; dots: any[] }>
   >({});
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedDateEvents, setSelectedDateEvents] = useState([]);
+  const [selectedDateEvents, setSelectedDateEvents] = useState<Event[]>([]);
   const [eventLoading, setEventLoading] = useState(false);
   const router = useRouter();
 
@@ -35,11 +48,14 @@ const EventList = () => {
       try {
         const key = await AsyncStorage.getItem("apiKey");
         const result = await fetchData("events", key);
-        setEvents(result);
+        
+        // Filter out events with status "Declined"
+        const approvedEvents = result.filter((event: Event) => event.event_status !== "Declined");
+        setEvents(approvedEvents);
 
         // Create marked dates object for the calendar
-        const dates = {};
-        result.forEach((event) => {
+        const dates: Record<string, { marked: boolean; dots: any[] }> = {};
+        approvedEvents.forEach((event: Event) => {
           if (event.event_date) {
             if (!dates[event.event_date]) {
               dates[event.event_date] = {
@@ -63,7 +79,7 @@ const EventList = () => {
     fetchEvents();
   }, []);
 
-  const handleDayPress = (day) => {
+  const handleDayPress = (day: { dateString: string }) => {
     const selectedDate = day.dateString;
     // Set loading state while processing the selection
     setEventLoading(true);
@@ -87,7 +103,7 @@ const EventList = () => {
     }, 800); // Small delay to show loading state
   };
 
-  const getEventsRegCount = async (event: any) => {
+  const getEventsRegCount = async (event: Event) => {
     try {
       const response = await fetch(
         `${SERVER_ADDRESS}/data/event_registrations/count?field=event_id&value=${event.event_id}`,
@@ -103,7 +119,7 @@ const EventList = () => {
     }
   };
 
-  const goToEventDetails = (event: any) => {
+  const goToEventDetails = (event: Event) => {
     setModalVisible(false);
     setEventLoading(true); // Show loading throbber
 
@@ -126,7 +142,7 @@ const EventList = () => {
     }, 1000);
   };
 
-  const renderEventItem = ({ item }) => (
+  const renderEventItem = ({ item }: { item: Event }) => (
     <TouchableOpacity
       style={styles.eventItem}
       onPress={() => goToEventDetails(item)}

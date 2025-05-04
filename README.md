@@ -1,4 +1,4 @@
-# NSBM Super App Mobile App
+# NSBM Super App
 
 This README provides instructions on how to set up and run the NSBM Super App mobile application, a comprehensive app designed for NSBM students.
 

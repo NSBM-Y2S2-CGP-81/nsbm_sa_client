@@ -43,6 +43,7 @@ const SignUpScreen: React.FC = () => {
   const [faculty, setFaculty] = useState<string>("");
   const [availableDegrees, setAvailableDegrees] = useState<string[]>([]);
   const [passwordError, setPasswordError] = useState<string>("");
+  const [emailError, setEmailError] = useState<string>("");
 
   const universities = [
     "NSBM Green University",
@@ -88,14 +89,36 @@ const SignUpScreen: React.FC = () => {
     return true;
   };
 
+  const validateEmail = (email: string): boolean => {
+    if (!email.endsWith("@students.nsbm.ac.lk")) {
+      setEmailError("Email must end with @students.nsbm.ac.lk");
+      return false;
+    }
+    setEmailError("");
+    return true;
+  };
+
   const handleSignIn = async () => {
-    // Validate password before proceeding
-    if (!validatePassword(password)) {
+    // Validate password and email before proceeding
+    const isPasswordValid = validatePassword(password);
+    const isEmailValid = validateEmail(mail);
+
+    if (!isPasswordValid) {
       Toast.show({
         type: "error",
         position: "top",
         text1: "Password Error",
         text2: passwordError,
+      });
+      return;
+    }
+
+    if (!isEmailValid) {
+      Toast.show({
+        type: "error",
+        position: "top",
+        text1: "Email Error",
+        text2: emailError,
       });
       return;
     }
@@ -263,10 +286,20 @@ const SignUpScreen: React.FC = () => {
             style={styles.input}
             placeholder="someone@students.nsbm.ac.lk"
             value={mail}
-            onChangeText={setMail}
+            onChangeText={(text) => {
+              setMail(text);
+              if (text.length > 0) {
+                validateEmail(text);
+              } else {
+                setEmailError("");
+              }
+            }}
             keyboardType="email-address"
             autoCapitalize="none"
           />
+          {emailError ? (
+            <CustomText style={styles.errorText}>{emailError}</CustomText>
+          ) : null}
 
           <CustomText style={styles.label}>Password</CustomText>
           <TextInput

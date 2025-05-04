@@ -1,47 +1,141 @@
-## Get started
+# NSBM Super App Mobile App
 
-1. Install dependencies
+This README provides instructions on how to set up and run the NSBM Super App mobile application, a comprehensive app designed for NSBM students.
 
+## Table of Contents
+
+1. [Overview](#overview)
+2. [Prerequisites](#prerequisites)
+3. [Installation](#installation)
+4. [Configuration](#configuration)
+5. [Running the Application](#running-the-application)
+6. [Features](#features)
+7. [Project Structure](#project-structure)
+8. [Troubleshooting](#troubleshooting)
+
+## Overview
+
+The NSBM Super App is a mobile application that provides various services to NSBM students, including:
+- Event management and registration
+- Lecture scheduling
+- Campus map navigation
+- Seat availability information
+- Food service access
+- User profile management
+
+## Prerequisites
+
+Before getting started, ensure you have the following installed:
+
+- Node.js (version 14.x or higher)
+- npm (version 7.x or higher)
+- Expo CLI (`npm install -g expo-cli`)
+- Android Studio (for Android emulation) or Xcode (for iOS simulation)
+- Git
+
+## Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/NSBM-Y2S2-CGP-81/nsbm_sa_client
+   cd nsbm_sa_client
+   ```
+
+2. Install dependencies:
    ```bash
    npm install
    ```
 
-2. Start the app
+## Configuration
 
-   ```bash
-    npx expo start
+1. Create a config file at `config.js` in the root of the project if it doesn't exist:
+
+   ```javascript
+   // config.js
+   const SERVER_ADDRESS = "http://47.128.245.74:5000";
+   export default SERVER_ADDRESS;
    ```
 
-In the output, you'll find options to open the app in a
+   Replace the URL with your actual backend server address.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+2. Make sure you have properly set up any necessary environment variables.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## Running the Application
 
-## Get a fresh project
+1. Start the development server:
+   ```bash
+   npx expo start
+   ```
 
-When you're ready, run:
+2. Use the Expo Go app on your physical device or run on an emulator:
+   - Press `a` to open on Android emulator
+   - Press `i` to open on iOS simulator
+   - Scan the QR code with Expo Go app on your physical device
 
-```bash
-npm run reset-project
-```
+## Features
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### Authentication
+- Sign in with NSBM student email
+- Sign up with student details
+- Secure authentication token management
 
-## Learn more
+### Event Management
+- View upcoming events and stalls
+- Register for events
+- Create event requests
+- View event details and status
 
-To learn more about developing your project with Expo, look at the following resources:
+### Campus Navigation
+- Interactive university map
+- Location finder for key campus locations
+- Road map with GPS integration
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+### Seat Availability
+- Real-time seat availability in faculties
+- Library seat status
+- Faculty-specific seat information
 
-## Join the community
+### Food Services
+- Access to campus food services
+- Food ordering capabilities
 
-Join our community of developers creating universal apps.
+### User Profile
+- View and manage student information
+- Update profile details
+- Secure logout functionality
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
-# nsbm_sa_client
+## Project Structure
+
+The application follows Expo's file-based routing structure:
+
+- `app/` - Main application code
+  - `(auth)/` - Authentication screens
+  - `(main_screen)/` - Main application screens
+  - `services/` - API and utility services
+- `components/` - Reusable UI components
+- `assets/` - Images, fonts, and other static assets
+- `config.js` - Configuration file
+
+## Troubleshooting
+
+### Common Issues
+
+1. **API Connection Errors**
+   - Verify your backend server is running
+   - Check the SERVER_ADDRESS in config.js
+   - Ensure your device/emulator can access the network
+
+2. **Authentication Issues**
+   - Clear AsyncStorage and try logging in again
+   - Verify credentials format (email must end with @students.nsbm.ac.lk)
+
+3. **UI Display Issues**
+   - Reload the app with `r` in the Expo CLI
+   - Clear cache with `expo start -c`
+
+4. **Permission Issues**
+   - Ensure necessary permissions are granted for features like maps or document picking
+
+### Support
+
+For additional help, contact the development team or submit an issue in the project repository.

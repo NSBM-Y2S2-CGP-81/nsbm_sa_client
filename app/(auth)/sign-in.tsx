@@ -18,8 +18,44 @@ import { Stack } from "expo-router";
 const SignInScreen = () => {
   const [mail, setMail] = useState("");
   const [password, setPassword] = useState("");
+  const [emailError, setEmailError] = useState("");
+
+  const validateEmail = (email: string) => {
+    if (!email.endsWith("@students.nsbm.ac.lk")) {
+      setEmailError("Email must end with @students.nsbm.ac.lk");
+      return false;
+    }
+    setEmailError("");
+    return true;
+  };
 
   const handleSignIn = async () => {
+    if (!validateEmail(mail)) {
+      Toast.show({
+        type: "error",
+        position: "top",
+        text1: "Invalid Email",
+        text2: "Email must end with @students.nsbm.ac.lk",
+        visibilityTime: 4000,
+        autoHide: true,
+        topOffset: 50,
+      });
+      return;
+    }
+
+    if (!password.trim()) {
+      Toast.show({
+        type: "error",
+        position: "top",
+        text1: "Invalid Password",
+        text2: "Password cannot be empty",
+        visibilityTime: 4000,
+        autoHide: true,
+        topOffset: 50,
+      });
+      return;
+    }
+
     const credentials = {
       email: mail,
       password: password,
@@ -125,8 +161,16 @@ const SignInScreen = () => {
             style={styles.input}
             placeholder="someone@students.nsbm.ac.lk"
             value={mail}
-            onChangeText={setMail}
+            onChangeText={(text) => {
+              setMail(text);
+              if (text) validateEmail(text);
+            }}
+            keyboardType="email-address"
+            autoCapitalize="none"
           />
+          {emailError ? (
+            <CustomText style={styles.errorText}>{emailError}</CustomText>
+          ) : null}
 
           <CustomText style={styles.label}>Password</CustomText>
           <TextInput
@@ -245,6 +289,12 @@ const styles = StyleSheet.create({
     marginTop: 15,
     fontWeight: "200",
     fontSize: 14,
+  },
+  errorText: {
+    color: "red",
+    fontSize: 12,
+    marginTop: -10,
+    marginBottom: 10,
   },
 });
 

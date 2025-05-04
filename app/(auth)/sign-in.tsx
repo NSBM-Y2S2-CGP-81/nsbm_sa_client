@@ -92,6 +92,7 @@ const SignInScreen = () => {
         nic: data.nic || "",
         created_at: data.created_at || "",
         password: password,
+        userid: data.user_id || "", // Added user_id to store in local storage
       };
 
       await AsyncStorage.removeItem("apiKey");

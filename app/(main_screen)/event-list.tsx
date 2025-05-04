@@ -48,9 +48,11 @@ const EventList = () => {
       try {
         const key = await AsyncStorage.getItem("apiKey");
         const result = await fetchData("events", key);
-        
+
         // Filter out events with status "Declined"
-        const approvedEvents = result.filter((event: Event) => event.event_status !== "Declined");
+        const approvedEvents = result.filter(
+          (event: Event) => event.event_status !== "Declined",
+        );
         setEvents(approvedEvents);
 
         // Create marked dates object for the calendar

@@ -166,6 +166,7 @@ const SignUpScreen: React.FC = () => {
         text1: "Registration Successful !",
       });
       storeData("apiKey", data.access_token);
+      storeData("user_id", data.user_id);
       storeData("full_name", name);
       storeData("email", mail);
       storeData("phone_number", phone);

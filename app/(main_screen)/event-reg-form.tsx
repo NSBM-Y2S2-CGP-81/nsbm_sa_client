@@ -206,6 +206,7 @@ const CreateEventScreen = ({ navigation }) => {
       maxTickets: parseInt(maxTickets, 10),
       eventType,
       societyName: eventType === "A Stall" ? "" : societyName,
+      creatorEmail: userEmail, // Add userEmail to the payload
     };
 
     // Add registration link if event is not a stall

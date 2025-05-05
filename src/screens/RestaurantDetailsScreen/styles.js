@@ -11,7 +11,6 @@ export default StyleSheet.create({
   },
   image: {
     width: "100%", // Make it even smaller and more noticeable
-    height: 100, // Fixed height
     aspectRatio: 1, // Keep it square
     alignSelf: "center", // Center it horizontally
     marginTop: 20, // Add some space at the top

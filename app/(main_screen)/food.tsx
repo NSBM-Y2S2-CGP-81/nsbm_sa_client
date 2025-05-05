@@ -15,11 +15,9 @@ export default function FoodScreen() {
         navigateTo="/(main_screen)/service-menu"
       />
       <View style={styles.container}>
-        <NavigationIndependentTree>
-          <NavigationContainer independent={true}>
-            <RootNavigator />
-          </NavigationContainer>
-        </NavigationIndependentTree>
+        <NavigationContainer independent={true}>
+          <RootNavigator />
+        </NavigationContainer>
       </View>
     </>
   );

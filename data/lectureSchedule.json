@@ -1,0 +1,74 @@
+[
+  {
+    "StudentID": "PLY123",
+    "Module Name": "Software Development Tools and Practices",
+    "Lecturer": "Dr. Rasika Ranaweera / Ms. Pavithra Subhashini",
+    "Monday": "2025-05-12"
+  },
+  {
+    "StudentID": "PLY123",
+    "Module Name": "Mobile Application Development",
+    "Lecturer": "Mr. Diluka Wijesinghe",
+    "Tuesday": "2025-05-13"
+  },
+  {
+    "StudentID": "PLY123",
+    "Module Name": "Introduction to IOT",
+    "Lecturer": "Mr. Isuru Bandara",
+    "Wednesday": "2025-05-14"
+  },
+  {
+    "StudentID": "PLY123",
+    "Module Name": "Database Management Systems",
+    "Lecturer": "Ms. Kalpani Perera",
+    "Thursday": "2025-05-15"
+  },
+  {
+    "StudentID": "PLY123",
+    "Module Name": "Data Structures and Algorithms",
+    "Lecturer": "Mr. Sandun Wickramasinghe",
+    "Friday": "2025-05-16"
+  },
+  {
+    "StudentID": "PLY123",
+    "Module Name": "Human Computer Interaction",
+    "Lecturer": "Dr. Dilani Ranaweera",
+    "Monday": "2025-05-19"
+  },
+  {
+    "StudentID": "PLY456",
+    "Module Name": "Computing Group Project",
+    "Lecturer": "Dr. Mohomad Shafraz",
+    "Monday": "2025-05-12"
+  },
+  {
+    "StudentID": "PLY456",
+    "Module Name": "Introduction to IOT",
+    "Lecturer": "Mr. Isuru Bandara",
+    "Tuesday": "2025-05-13"
+  },
+  {
+    "StudentID": "PLY456",
+    "Module Name": "Web Application Development",
+    "Lecturer": "Ms. Praveena Karunarathne",
+    "Wednesday": "2025-05-14"
+  },
+  {
+    "StudentID": "PLY456",
+    "Module Name": "Software Engineering",
+    "Lecturer": "Dr. Rasika Ranaweera",
+    "Thursday": "2025-05-15"
+  },
+  {
+    "StudentID": "PLY456",
+    "Module Name": "Computer Networks",
+    "Lecturer": "Mr. Ruwan Jayasundara",
+    "Friday": "2025-05-16"
+  },
+  {
+    "StudentID": "PLY456",
+    "Module Name": "Operating Systems",
+    "Lecturer": "Mr. Dilan Chandima",
+    "Monday": "2025-05-19"
+  }
+]

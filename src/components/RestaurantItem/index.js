@@ -13,7 +13,10 @@ const RestaurantItem = ({ restaurant }) => {
   const navigation = useNavigation();
 
   const onPress = () => {
-    navigation.navigate("Restaurant", { id: restaurant.id });
+    navigation.navigate("Restaurant", {
+      id: restaurant.id,
+      name: restaurant.name,
+    });
   };
 
   // Function to get the correct image source

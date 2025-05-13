@@ -10,6 +10,7 @@ import {
   Vibration,
   TouchableOpacity,
   Linking,
+  RefreshControl,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Carousel, { Pagination } from "react-native-reanimated-carousel";
@@ -51,6 +52,7 @@ export default function HomeScreen() {
   const [fullName, setFullName] = useState("Loading...");
   const [loadingstate, setLoadingState] = useState(true);
   const [events, setEvents] = useState<Event[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     const validateLogin = async () => {
@@ -90,6 +92,30 @@ export default function HomeScreen() {
 
     validateLogin();
   }, []);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      const key = await AsyncStorage.getItem("apiKey");
+      if (key) {
+        const result = await fetchData("news", key);
+        setNewsData(result);
+        const result_events = await fetchData("events", key);
+        const filteredEvents = result_events.filter((event: Event) => event?.event_status !== "Declined");
+        setEvents(filteredEvents);
+      }
+    } catch (error) {
+      console.error("Error refreshing data:", error);
+      Toast.show({
+        type: "error",
+        position: "bottom",
+        text1: "Error",
+        text2: "Failed to refresh data.",
+      });
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   if (loadingstate) {
     return (
@@ -184,7 +210,12 @@ export default function HomeScreen() {
           />
         </View>
       </View>
-      <ScrollView style={styles.container}>
+      <ScrollView
+        style={styles.container}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
         <Carousel
           mode="parallax"
           width={width}

@@ -1,78 +1,99 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-// import DateTimePicker from "@react-native-community/datetimepicker";
+import React, { useState } from "react"
+import { View, Text, StyleSheet, TouchableOpacity, Platform } from "react-native"
+import DateTimePicker from "@react-native-community/datetimepicker"
 
 export default function LectureScheduleViewer() {
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date())
+  const [showDatePicker, setShowDatePicker] = useState(false)
 
-  // Dummy lecture data for the selected date
+  // Static dataset for frontend rendering — will later be replaced with Excel parsing
   const lectures = [
-    { id: 1, module: "Mathematics", hall: "Hall 1" },
-    { id: 2, module: "Physics", hall: "Hall 2" },
-  ];
+    { id: 1, module: "Data Structures and Algorithms", hall: "FOC-C2-105", date: "2025-04-01" },
+    { id: 2, module: "Database Management Systems", hall: "FOC-C2-L101", date: "2025-04-01" },
+    { id: 3, module: "Software Engineering", hall: "FOC-C2-L102", date: "2025-04-02" },
+    { id: 4, module: "Web Application Development", hall: "FOC-C2-003", date: "2025-04-03" },
+    { id: 5, module: "Computer Networks", hall: "FOB-C1-L104", date: "2025-04-03" },
+    { id: 6, module: "Operating Systems", hall: "FOB-C1-004", date: "2025-04-04" }
+  ]
 
-  const onChange = (event: any, date?: Date) => {
-    setShowDatePicker(false);
-    if (date) {
-      setSelectedDate(date);
-    }
-  };
+  const formattedDate = selectedDate.toISOString().split("T")[0]
+  const filteredLectures = lectures.filter(l => l.date === formattedDate)
+
+  const handleDateChange = (event: any, newDate?: Date) => {
+    if (Platform.OS === "android") setShowDatePicker(false)
+    if (newDate) setSelectedDate(newDate)
+  }
 
   return (
     <View style={styles.container}>
+      {/* Date selection header */}
       <TouchableOpacity onPress={() => setShowDatePicker(true)}>
         <Text style={styles.heading}>
           Select Date: {selectedDate.toLocaleDateString()}
         </Text>
       </TouchableOpacity>
-      {/* {showDatePicker && (
-        // TODO
-        // <DateTimePicker
-        //   value={selectedDate}
-        //   mode="date"
-        //   display="default"
-        //   onChange={onChange}
-        // />
-      )} */}
 
+      {showDatePicker && (
+        <DateTimePicker
+          value={selectedDate}
+          mode="date"
+          display="default"
+          onChange={handleDateChange}
+        />
+      )}
+
+      {/* Filtered lecture cards */}
       <View style={styles.lectureList}>
-        {lectures.map((lecture) => (
-          <View key={lecture.id} style={styles.lectureItem}>
-            <Text style={styles.moduleText}>{lecture.module}</Text>
-            <Text style={styles.hallText}>({lecture.hall})</Text>
-          </View>
-        ))}
+        {filteredLectures.length > 0 ? (
+          filteredLectures.map(lecture => (
+            <View key={lecture.id} style={styles.lectureItem}>
+              <Text style={styles.moduleText}>{lecture.module}</Text>
+              <Text style={styles.hallText}>{lecture.hall}</Text>
+            </View>
+          ))
+        ) : (
+          <Text style={styles.noLectureText}>No lectures scheduled</Text>
+        )}
       </View>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: 10,
+    marginTop: 20,
+    paddingHorizontal: 10
   },
   heading: {
     fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 5,
+    color: "#333"
   },
   lectureList: {
-    marginTop: 10,
+    marginTop: 15
   },
   lectureItem: {
     flexDirection: "row",
     justifyContent: "space-between",
-    backgroundColor: "#f4f4f4",
-    padding: 10,
-    marginBottom: 5,
-    borderRadius: 4,
+    backgroundColor: "#f2f2f2",
+    padding: 12,
+    marginBottom: 8,
+    borderRadius: 6
   },
   moduleText: {
     fontSize: 16,
+    fontWeight: "500",
+    color: "#000"
   },
   hallText: {
     fontSize: 16,
-    color: "gray",
+    color: "#555"
   },
-});
+  noLectureText: {
+    fontSize: 16,
+    color: "#999",
+    fontStyle: "italic",
+    textAlign: "center",
+    marginTop: 20
+  }
+})

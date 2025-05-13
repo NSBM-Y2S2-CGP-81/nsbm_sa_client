@@ -17,10 +17,24 @@ import Icon from "react-native-vector-icons/MaterialIcons"; // Import icon libra
 
 const { width } = Dimensions.get("window");
 
+interface Event {
+  id: string;
+  event_name: string;
+  event_date: string;
+  event_time: string;
+  event_venue: string;
+  event_status: string;
+  event_tickets: number;
+  event_image: string;
+  event_link: string;
+}
+
 const UpcomingEventsScreen = () => {
-  const [events, setEvents] = useState([]);
+  const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(false);
   const [sortByDate, setSortByDate] = useState(true); // State for sorting
+  const [buttonLoading, setButtonLoading] = useState(false); // State for button loading
+  const [cardLoading, setCardLoading] = useState(false); // State for card loading
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -57,6 +71,43 @@ const UpcomingEventsScreen = () => {
     setSortByDate(!sortByDate);
   };
 
+  const handleCreateEventPress = async () => {
+    setButtonLoading(true);
+    try {
+      // Simulate a delay or perform any necessary action here
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      router.push("/(main_screen)/event-reg-form");
+    } catch (error) {
+      console.error("Error navigating to event registration form:", error);
+    } finally {
+      setButtonLoading(false);
+    }
+  };
+
+  const handleEventCardPress = async (item: Event) => {
+    setCardLoading(true);
+    try {
+      router.push({
+        pathname: "/(main_screen)/event-details",
+        params: {
+          id: item.id,
+          title: item.event_name,
+          date: item.event_date,
+          time: item.event_time,
+          venue: item.event_venue,
+          status: item.event_status,
+          tickets: item.event_tickets,
+          image: item.event_image,
+          link: item.event_link,
+        },
+      });
+    } catch (error) {
+      console.error("Error navigating to event details:", error);
+    } finally {
+      setCardLoading(false);
+    }
+  };
+
   return (
     <>
       <TopNavigationComponent
@@ -65,6 +116,8 @@ const UpcomingEventsScreen = () => {
         navigateTo="/(main_screen)/event-list"
       />
       {loading ? (
+        <Loading />
+      ) : cardLoading ? (
         <Loading />
       ) : (
         <View style={styles.container}>
@@ -82,23 +135,29 @@ const UpcomingEventsScreen = () => {
             ListHeaderComponent={<View style={{ height: 20 }} />}
             contentContainerStyle={{ paddingBottom: 100 }}
             renderItem={({ item }) => (
-              <View style={styles.eventCard}>
-                <Image
-                  source={{ uri: item.event_image }}
-                  style={styles.eventImage}
-                />
-                <Text style={styles.eventTitle}>{item.event_name}</Text>
-                <Text style={styles.eventDate}>{item.event_date}</Text>
-              </View>
+              <TouchableOpacity onPress={() => handleEventCardPress(item)}>
+                <View style={styles.eventCard}>
+                  <Image
+                    source={{ uri: item.event_image }}
+                    style={styles.eventImage}
+                  />
+                  <Text style={styles.eventTitle}>{item.event_name}</Text>
+                  <Text style={styles.eventDate}>{item.event_date}</Text>
+                </View>
+              </TouchableOpacity>
             )}
             keyExtractor={(item) => item.id?.toString() || Math.random().toString()}
           />
-          <TouchableOpacity
-            style={styles.createEventButton}
-            onPress={() => router.push("/(main_screen)/event-reg-form")}
-          >
-            <Text style={styles.createEventText}>Create an Event</Text>
-          </TouchableOpacity>
+          {buttonLoading ? (
+            <Loading />
+          ) : (
+            <TouchableOpacity
+              style={styles.createEventButton}
+              onPress={handleCreateEventPress}
+            >
+              <Text style={styles.createEventText}>Create an Event</Text>
+            </TouchableOpacity>
+          )}
         </View>
       )}
     </>

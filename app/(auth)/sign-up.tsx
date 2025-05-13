@@ -66,9 +66,24 @@ const SignUpScreen: React.FC = () => {
   const storeData = async (key: string, value: string) => {
     try {
       await AsyncStorage.setItem(key, value);
-      console.log("Data stored successfully");
+      console.log(`Data stored successfully for key: ${key}`);
+      // Verify the data was stored correctly
+      const storedValue = await AsyncStorage.getItem(key);
+      console.log(`Verification - ${key}: ${storedValue}`);
     } catch (error) {
-      console.error("Error storing data", error);
+      console.error(`Error storing data for key: ${key}`, error);
+    }
+  };
+
+  // Retrieve all user data for verification
+  const retrieveAllUserData = async () => {
+    try {
+      const userData = await AsyncStorage.getItem('userData');
+      console.log("Retrieved complete user data:", userData);
+      return userData ? JSON.parse(userData) : null;
+    } catch (error) {
+      console.error("Error retrieving user data:", error);
+      return null;
     }
   };
 
@@ -160,18 +175,58 @@ const SignUpScreen: React.FC = () => {
       }
 
       const data = await response.json();
+
+      console.log("Response data received:", JSON.stringify(data));
+      
+      // Store all user data in a single object to reduce AsyncStorage calls
+      const userData = {
+        apiKey: data.access_token || "",
+        user_id: data.user_id || "",
+        full_name: name || "",
+        email: mail || "",
+        phone_number: phone || "",
+        user_type: signType || "",
+        password: password || "",
+        student_id: studentid || "",
+        intake: intake || "",
+        degree: degree || "",
+        university: university || "",
+        nic: nic || "",
+        profile_picture: credentials.profile_picture || "",
+        created_at: currentDateTime || "",
+        updated_at: currentDateTime || "",
+      };
+      
+      // Store the combined user data
+      try {
+        await AsyncStorage.setItem('userData', JSON.stringify(userData));
+        console.log("All user data stored as a single object");
+        
+        // Also store individual entries for backward compatibility
+        const storagePromises = Object.entries(userData).map(
+          ([key, value]) => storeData(key, value)
+        );
+        await Promise.all(storagePromises);
+        
+        // Verify all data was stored
+        const storedUserData = await AsyncStorage.getItem('userData');
+        console.log("Verification - Complete userData object stored:", storedUserData ? "Success" : "Failed");
+      } catch (error) {
+        console.error("Error storing complete user data:", error);
+        throw new Error("Failed to store user data");
+      }
+
       Toast.show({
         type: "success",
         position: "top",
         text1: "Registration Successful !",
       });
-      storeData("apiKey", data.access_token);
-      storeData("user_id", data.user_id);
-      storeData("full_name", name);
-      storeData("email", mail);
-      storeData("phone_number", phone);
-      storeData("user_type", signType);
-      storeData("password", password);
+
+      console.log("Data stored successfully");
+      
+      // Verify all data was saved correctly before navigation
+      const savedData = await retrieveAllUserData();
+      console.log("Complete verification of saved user data:", savedData);
 
       router.push("/"); // Navigate to the next screen after successful login
     } catch (error) {
